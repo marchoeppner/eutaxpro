@@ -24,19 +24,21 @@ run_name = (params.run_name == false) ? "${workflow.sessionId}" : "${params.run_
 
 WorkflowMain.initialise(workflow, params, log)
 
-// TODO: Rename this and the file under lib/ to something matching this pipeline (e.g. WorkflowAmplicons)
 WorkflowPipeline.initialise(params, log)
 
-// TODO: Rename this to something matching this pipeline, e.g. "AMPLICONS"
-include { MAIN } from './workflows/main'
+include { EUTAXPRO }            from './workflows/eutaxpro'
+include { BUILD_REFERENCES }    from './workflows/build_references'
 
 multiqc_report = Channel.from([])
 
 workflow {
-    // TODO: Rename to something matching this pipeline (see above)
-    MAIN()
 
-    multiqc_report = multiqc_report.mix(MAIN.out.qc).toList()
+    if (params.build_references) {
+        BUILD_REFERENCES()
+    } else {
+        EUTAXPRO()
+        multiqc_report = multiqc_report.mix(EUTAXPRO.out.qc).toList()
+    }
 }
 
 workflow.onComplete {
