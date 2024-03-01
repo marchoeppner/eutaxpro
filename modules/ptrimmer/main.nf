@@ -1,5 +1,4 @@
 process PTRIMMER {
-
     publishDir "${params.outdir}/${meta.sample_id}/PTRIMMER", mode: 'copy'
 
     label 'short_serial'
@@ -22,15 +21,13 @@ process PTRIMMER {
     script:
 
     if (meta.single_end) {
-
-
     } else {
         r1 = reads[0]
         r2 = reads[1]
         r1_trimmed = meta.sample_id + '_1.ptrimmed.fastq'
         r2_trimmed = meta.sample_id + '_2.ptrimmed.fastq'
-        r1_trimmed_gz = r1_trimmed + ".gz"
-        r2_trimmed_gz = r2_trimmed + ".gz"
+        r1_trimmed_gz = r1_trimmed + '.gz'
+        r2_trimmed_gz = r2_trimmed + '.gz'
 
         """
         ptrimmer -t pair -a $amplicon_txt -f $r1 -d $r1_trimmed -r $r2 -e $r2_trimmed

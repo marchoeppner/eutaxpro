@@ -21,7 +21,7 @@ process VSEARCH_FASTQFILTER {
     filtered = fq.getBaseName() + '.filtered.fasta'
 
     """
-    vsearch -fastq_filter $fq -fastq_maxee 0.5 -relabel Filtered -fastaout $filtered
+    vsearch -fastq_filter $fq -fastq_maxee_rate 0.1 -relabel Filtered -fastaout $filtered
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

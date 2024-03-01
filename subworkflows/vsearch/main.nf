@@ -1,10 +1,11 @@
 include { VSEARCH_FASTQMERGE }                          from './../../modules/vsearch/fastqmerge'
 include { VSEARCH_DEREPFULL }                           from './../../modules/vsearch/derep'
-include { VSEARCH_DEREPFULL as VSEARCH_DEREPFULL_ALL}   from './../../modules/vsearch/derep'
+include { VSEARCH_DEREPFULL as VSEARCH_DEREPFULL_ALL }  from './../../modules/vsearch/derep'
 include { VSEARCH_FASTQFILTER }                         from './../../modules/vsearch/fastqfilter'
-include { VSEARCH_CLUSTER }                             from './../../modules/vsearch/cluster'
-include { VSEARCH_CLUSTER as VSEARCH_CLUSTER_ALL }      from './../../modules/vsearch/cluster'
-include { VSEARCH_UCHIME_DENOVO }                       from './../../modules/vsearch/uchime/denovo'
+include { VSEARCH_CLUSTER_SIZE }                        from './../../modules/vsearch/cluster_size'
+include { VSEARCH_CLUSTER_SIZE as VSEARCH_CLUSTER_ALL } from './../../modules/vsearch/cluster_size'
+include { VSEARCH_CLUSTER_UNOISE }                      from './../../modules/vsearch/unoise'
+include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vsearch/uchime3/denovo'
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
 include { VSEARCH_EXTRACT_NONCHIMERIC }                 from './../../modules/vsearch/extract_nonchimeric'
 include { VSEARCH_EXTRACT_NONCHIMERIC as VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE } from './../../modules/vsearch/extract_nonchimeric'
@@ -22,7 +23,7 @@ workflow VSEARCH_WORKFLOW {
 
     // Merge PE files
     VSEARCH_FASTQMERGE(
-        reads.map {m,r -> [m, r[0],r[1]]}
+        reads.map { m, r -> [m, r[0], r[1]] }
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQMERGE.out.versions)
 
@@ -39,46 +40,37 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_DEREPFULL.out.versions)
 
-    VSEARCH_DEREPFULL.out.fasta.map {m,f -> f}.collectFile(name: 'all.fasta').map { fasta ->
-        [ [sample_id: "all" ], fasta ]
+    VSEARCH_DEREPFULL.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
+        [ [sample_id: 'all' ], fasta ]
     }.set { all_seqs }
 
     VSEARCH_DEREPFULL_ALL(
         all_seqs
     )
 
-    VSEARCH_CLUSTER(
-        VSEARCH_DEREPFULL_ALL.out.fasta,
+    VSEARCH_CLUSTER_UNOISE(
+        VSEARCH_DEREPFULL_ALL.out.fasta
+    )
+
+    VSEARCH_UCHIME3_DENOVO(
+        VSEARCH_CLUSTER_UNOISE.out.fasta
+    )
+
+    // We now make OTUs because that is good enough for our purpose
+    VSEARCH_CLUSTER_ALL(
+        VSEARCH_UCHIME3_DENOVO.out.fasta,
         params.vsearch_cluster_id
-    )
 
-    VSEARCH_UCHIME_DENOVO(
-        VSEARCH_CLUSTER.out.fasta
     )
-
-    VSEARCH_EXTRACT_NONCHIMERIC(
-        VSEARCH_DEREPFULL_ALL.out.fasta.collect(),
-        VSEARCH_CLUSTER.out.uc.map {m,u -> u}.collect(),
-        VSEARCH_UCHIME_DENOVO.out.fasta.map{ m,f -> f }.collect(),
-        params.vsearch_min_cov
-    )
-
-    VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE(
-        all_seqs.collect(),
-        VSEARCH_DEREPFULL_ALL.out.uc.map{m,u ->u}.collect(),
-        VSEARCH_EXTRACT_NONCHIMERIC.out.fasta.map{m,f -> f}.collect(),
-        params.vsearch_min_cov
-    )
-
+    // We taxonomically map the OTUS
     VSEARCH_SINTAX(
-        VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE.out.fasta,
+        VSEARCH_CLUSTER_ALL.out.fasta,
         sintax_db
     )
 
     emit:
     tsv = VSEARCH_SINTAX.out.tsv
     versions = ch_versions
-    fasta = VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE.out.fasta
+    fasta = VSEARCH_CLUSTER_ALL.out.fasta
     qc = ch_qc_files
-    
 }

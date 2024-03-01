@@ -1,11 +1,10 @@
 process DADA2_MERGE {
-
     publishDir "${params.outdir}/DADA2", mode: 'copy'
 
     label 'process_low'
 
     // https://depot.galaxyproject.org/singularity/bioconductor-dada2=1.28.0--r43hf17093f_0 doesnt contain 'digest', so keep here v1.22.0
-    conda "bioconda::bioconductor-dada2=1.22.0 conda-forge::r-digest=0.6.30"
+    conda 'bioconda::bioconductor-dada2=1.22.0 conda-forge::r-digest=0.6.30'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-dada2:1.22.0--r41h399db7b_0' :
         'biocontainers/bioconductor-dada2:1.22.0--r41h399db7b_0' }"
@@ -15,12 +14,12 @@ process DADA2_MERGE {
     path(rds)
 
     output:
-    path( "DADA2_stats.tsv" ), emit: dada2stats
-    path( "DADA2_table.tsv" ), emit: dada2asv
-    path( "ASV_table.tsv" )  , emit: asv
-    path( "ASV_seqs.fasta" ) , emit: fasta
-    path( "DADA2_table.rds" ), emit: rds
-    path "versions.yml"      , emit: versions
+    path("DADA2_stats.tsv"), emit: dada2stats
+    path("DADA2_table.tsv"), emit: dada2asv
+    path("ASV_table.tsv")  , emit: asv
+    path("ASV_seqs.fasta") , emit: fasta
+    path("DADA2_table.rds"), emit: rds
+    path 'versions.yml'      , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

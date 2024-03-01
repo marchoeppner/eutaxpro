@@ -1,5 +1,4 @@
 process UNZIP {
-
     tag "${zipped}"
 
     label 'medium_serial'

@@ -1,5 +1,4 @@
 process VSEARCH_DEREPFULL {
-    
     tag "${meta.sample_id}"
 
     publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
@@ -21,11 +20,11 @@ process VSEARCH_DEREPFULL {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix?: "${meta.sample_id}"
+    def prefix = task.ext.prefix ?: "${meta.sample_id}"
     derep = prefix + '.derep.fasta'
     derep_uc = prefix + '.derep.uc'
 
-    if (meta.sample_id != "all") {
+    if (meta.sample_id != 'all') {
         args = args.concat(" --relabel ${meta.sample_id}_Derep")
     }
     """

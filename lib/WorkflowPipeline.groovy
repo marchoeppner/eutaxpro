@@ -16,7 +16,6 @@ class WorkflowPipeline {
             log.info "The primer set ${params.primer_set} is not currently configured."
             System.exit(1)
         }
-
     }
 
 }

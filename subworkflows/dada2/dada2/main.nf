@@ -9,7 +9,6 @@ include { DADA2_RMCHIMERA }             from './../../../modules/dada2/rmchimera
 ch_versions = Channel.from([])
 
 workflow DADA2_WORKFLOW {
-
     take:
     reads
     single_end
@@ -19,6 +18,7 @@ workflow DADA2_WORKFLOW {
 
     main:
 
+    // Clean up the reads so DADA2 can work with them
     DADA2_PREPROCESSING(
         reads,
         single_end,
@@ -29,6 +29,7 @@ workflow DADA2_WORKFLOW {
     ch_filt_reads   = DADA2_PREPROCESSING.out.reads
     ch_versions     = ch_versions.mix(DADA2_PREPROCESSING.out.versions)
 
+    // Model read errors per sample
     DADA2_ERROR(
         ch_filt_reads
     )
@@ -36,30 +37,31 @@ workflow DADA2_WORKFLOW {
     ch_errormodel   = DADA2_ERROR.out.errormodel
 
     ch_filt_reads
-        .join( ch_errormodel )
+        .join(ch_errormodel)
         .set { ch_derep_errormodel }
-    
-    DADA2_DENOISING ( ch_derep_errormodel.dump(tag: 'into_denoising')  )
+
+    // Perform denoising of reads
+    DADA2_DENOISING(ch_derep_errormodel.dump(tag: 'into_denoising'))
     ch_versions = ch_versions.mix(DADA2_DENOISING.out.versions.first())
 
-    DADA2_RMCHIMERA ( DADA2_DENOISING.out.seqtab )
+    // Remove chimeras, if any
+    DADA2_RMCHIMERA(DADA2_DENOISING.out.seqtab)
 
     //group by sequencing run & group by meta
     DADA2_PREPROCESSING.out.logs
-        .join( DADA2_DENOISING.out.denoised )
-        .join( DADA2_DENOISING.out.mergers )
-        .join( DADA2_RMCHIMERA.out.rds )
+        .join(DADA2_DENOISING.out.denoised)
+        .join(DADA2_DENOISING.out.mergers)
+        .join(DADA2_RMCHIMERA.out.rds)
     .set { ch_track_numbers }
-    DADA2_STATS ( ch_track_numbers )
+    DADA2_STATS(ch_track_numbers)
 
     //merge if several runs, otherwise just publish
-    DADA2_MERGE (
+    DADA2_MERGE(
         DADA2_STATS.out.stats.map { meta, stats -> stats }.collect(),
-        DADA2_RMCHIMERA.out.rds.map { meta, rds -> rds }.collect() 
+        DADA2_RMCHIMERA.out.rds.map { meta, rds -> rds }.collect()
     )
 
-    emit: 
+    emit:
     fasta = DADA2_MERGE.out.fasta
     versions = ch_versions
-
 }

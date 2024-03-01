@@ -2,7 +2,7 @@ process DADA2_ERROR {
     tag "$meta.run"
     label 'process_medium'
 
-    conda "bioconda::bioconductor-dada2=1.28.0"
+    conda 'bioconda::bioconductor-dada2=1.28.0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-dada2:1.28.0--r43hf17093f_0' :
         'biocontainers/bioconductor-dada2:1.28.0--r43hf17093f_0' }"
@@ -11,21 +11,21 @@ process DADA2_ERROR {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path("*.err.rds"), emit: errormodel
-    tuple val(meta), path("*.err.pdf"), emit: pdf
-    tuple val(meta), path("*.err.svg"), emit: svg
-    tuple val(meta), path("*.err.log"), emit: log
-    tuple val(meta), path("*.err.convergence.txt"), emit: convergence
-    path "versions.yml"               , emit: versions
-    path "*.args.txt"                 , emit: args
+    tuple val(meta), path('*.err.rds'), emit: errormodel
+    tuple val(meta), path('*.err.pdf'), emit: pdf
+    tuple val(meta), path('*.err.svg'), emit: svg
+    tuple val(meta), path('*.err.log'), emit: log
+    tuple val(meta), path('*.err.convergence.txt'), emit: convergence
+    path 'versions.yml'               , emit: versions
+    path '*.args.txt'                 , emit: args
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
     def args = task.ext.args ?: [ 'nbases = 1e8, nreads = NULL, randomize = TRUE, MAX_CONSIST = 10, OMEGA_C = 0, qualityType = "Auto"',
-            params.pacbio ? "errorEstimationFunction = PacBioErrfun" : "errorEstimationFunction = loessErrfun"
-        ].join(',').replaceAll('(,)*$', "")
+            params.pacbio ? 'errorEstimationFunction = PacBioErrfun' : 'errorEstimationFunction = loessErrfun'
+        ].join(',').replaceAll('(,)*$', '')
     def seed = task.ext.seed ?: '100'
     if (!meta.single_end) {
         """

@@ -20,7 +20,7 @@ process VSEARCH_EXTRACT_NONCHIMERIC {
     tuple val(meta), path(nonchim), emit: fasta
 
     script:
-    nonchim = fasta1.getBaseName() + ".nonchimeric.fasta"
+    nonchim = fasta1.getBaseName() + '.nonchimeric.fasta'
 
     """
     vsearch_extract_nonchimeric.pl $fasta1 $uc $fasta2 $mincov > $nonchim

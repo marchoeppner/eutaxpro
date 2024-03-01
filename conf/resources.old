@@ -1,0 +1,61 @@
+params {
+
+  references {
+
+    genes {
+
+      'lrrna' {
+        'dada2' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/DADA2/longest/MIDORI2_LONGEST_NUC_GB259_lrRNA_DADA2.fasta.gz"
+          db = "${params.reference_base}/lrna/dada2/MIDORI2_LONGEST_NUC_GB259_lrRNA_DADA2.fasta"
+        }
+        'sintax' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/SINTAX/longest/MIDORI2_LONGEST_NUC_GB259_lrRNA_SINTAX.fasta.gz"
+          db = "${params.reference_base}/lrna/MIDORI2_LONGEST_NUC_GB259_lrRNA_SINTAX.fasta"
+        }
+      }
+      'srrna' {
+        'dada2' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/DADA2/longest/MIDORI2_LONGEST_NUC_GB259_srRNA_DADA2.fasta.gz"
+          db = "${params.reference_base}/srrna/dada2/MIDORI2_LONGEST_NUC_GB259_srRNA_DADA2.fasta"
+        }
+        'sintax' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/SINTAX/longest/MIDORI2_LONGEST_NUC_GB259_srRNA_SINTAX.fasta.gz"
+          db = "${params.reference_base}/srrna/sintax/MIDORI2_LONGEST_NUC_GB259_srRNA_SINTAX.fasta"
+        }
+      }
+      'co1' {
+        'dada2' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/DADA2/longest/MIDORI2_LONGEST_NUC_GB259_CO1_DADA2.fasta.gz"
+          db = "${params.reference_base}/co1/dada2/MIDORI2_LONGEST_NUC_GB259_CO1_DADA2.fasta"
+        }
+        'sintax' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/SINTAX/longest/MIDORI2_LONGEST_NUC_GB259_CO1_SINTAX.fasta.gz"
+          db = "${params.reference_base}/co1/sintax/MIDORI2_LONGEST_NUC_GB259_CO1_SINTAX.fasta"
+        }
+      }
+      'cytb' {
+        'dada2' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/DADA2/longest/MIDORI2_LONGEST_NUC_GB259_Cytb_DADA2.fasta.gz"
+          db = "${params.reference_base}/cytb/dada2/MIDORI2_LONGEST_NUC_GB259_Cytb_DADA2.fasta"
+        }
+        'sintax' {
+          url = "https://www.reference-midori.info/download/Databases/GenBank259_2023-12-17/SINTAX/longest/MIDORI2_LONGEST_NUC_GB259_Cytb_SINTAX.fasta.gz"
+          db = "${params.reference_base}/cytb/sintax/MIDORI2_LONGEST_NUC_GB259_Cytb_SINTAX.fasta"
+        }
+      }
+    }
+
+    primers {
+      'default' {
+        gene = "lrrna"
+        tool = "sintax"
+        r1_clip = 140
+        r2_clip = 130
+        ptrimmer_config = "${baseDir}/assets/ptrimmer/default.txt"
+      }
+    }
+
+  }
+  
+}

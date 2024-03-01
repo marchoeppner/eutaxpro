@@ -4,7 +4,7 @@ process VSEARCH_SINTAX {
 
     publishDir "${params.outdir}/VSEARCH", mode: 'copy'
 
-    conda "bioconda::vsearch=2.27.1"
+    conda 'bioconda::vsearch=2.27.1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/vsearch:2.27.0--h6a68c12_0' :
         'quay.io/biocontainers/vsearch:2.27.0--h6a68c12_0' }"
@@ -15,7 +15,7 @@ process VSEARCH_SINTAX {
 
     output:
     tuple val(meta), path('*.tsv')   , optional: true, emit: tsv
-    path "versions.yml"              , emit: versions
+    path 'versions.yml'              , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

@@ -1,5 +1,4 @@
-process VSEARCH_CLUSTER {
-    
+process VSEARCH_UCHIME3_DENOVO {
     tag "${meta.sample_id}"
 
     publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
@@ -13,25 +12,20 @@ process VSEARCH_CLUSTER {
 
     input:
     tuple val(meta), path(fa)
-    val(cluster_id)
 
     output:
-    tuple val(meta), path(cluster), emit: fasta
-    tuple val(meta),path(uc), emit: uc
+    tuple val(meta), path(nonchimera), emit: fasta
     path("versions.yml"), emit: versions
 
     script:
-    def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix?: "${meta.sample_id}"
-    cluster = meta.sample_id + '.precluster.fasta'
-    uc = meta.sample_id + '.precluster.uc'
+    nonchimera = meta.sample_id + '.uchime_denovo.fasta'
+    derep_uc = meta.sample_id + '.uchime_denovo.uc'
 
     """
-    vsearch --cluster_size $fa \
-    --threads ${task.cpus} \
-    --id $cluster_id \
-    --uc $uc \
-    --centroids $cluster $args
+    vsearch --uchime3_denovo $fa \
+    --sizein \
+    --sizeout \
+    --nonchimera $nonchimera
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

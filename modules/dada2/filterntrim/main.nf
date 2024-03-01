@@ -2,7 +2,7 @@ process DADA2_FILTNTRIM {
     tag "$meta.sample_id"
     label 'process_medium'
 
-    conda "bioconda::bioconductor-dada2=1.28.0"
+    conda 'bioconda::bioconductor-dada2=1.28.0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-dada2:1.28.0--r43hf17093f_0' :
         'biocontainers/bioconductor-dada2:1.28.0--r43hf17093f_0' }"
@@ -11,8 +11,8 @@ process DADA2_FILTNTRIM {
     tuple val(meta), path(reads), val(trunclenf), val(trunclenr)
 
     output:
-    tuple val(meta), path("*.filt.fastq.gz"), path("*.filter_stats.tsv"), path("*.args.txt"), emit: reads_logs_args
-    path "versions.yml"                        , emit: versions
+    tuple val(meta), path('*.filt.fastq.gz'), path('*.filter_stats.tsv'), path('*.args.txt'), emit: reads_logs_args
+    path 'versions.yml'                        , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -28,7 +28,7 @@ process DADA2_FILTNTRIM {
         'maxN = 0, truncQ = 2, trimRight = 0, minQ = 0, rm.lowcomplex = 0, orient.fwd = NULL, matchIDs = FALSE, id.sep = "\\\\s", id.field = NULL, n = 1e+05, OMP = TRUE, qualityType = "Auto"',
         meta.single_end ? "maxEE = ${params.max_ee}" : "maxEE = c(${params.max_ee}, ${params.max_ee})",
         "trimLeft = 0, minLen = ${params.min_len}, rm.phix = TRUE"
-    ].join(',').replaceAll('(,)*$', "")
+    ].join(',').replaceAll('(,)*$', '')
 
     """
     #!/usr/bin/env Rscript

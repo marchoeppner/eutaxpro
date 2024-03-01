@@ -1,5 +1,5 @@
 process GUNZIP {
-    tag "${zipped}"
+    tag "${meta.target}|${zipped}"
 
     label 'medium_serial'
 

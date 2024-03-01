@@ -1,4 +1,4 @@
-process VSEARCH_DEREPFULL {
+process VSEARCH_CLUSTER_SIZE {
     tag "${meta.sample_id}"
 
     publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
@@ -12,24 +12,25 @@ process VSEARCH_DEREPFULL {
 
     input:
     tuple val(meta), path(fa)
+    val(cluster_id)
 
     output:
-    tuple val(meta), path(derep), emit: fasta
+    tuple val(meta), path(cluster), emit: fasta
+    tuple val(meta), path(uc), emit: uc
     path("versions.yml"), emit: versions
 
     script:
-    derep = meta.sample_id + '.derep.fasta'
-    derep_uc = meta.sample_id + '.uc'
-    options = ''
-    if (!meta.sample_id == 'all') {
-        options = "--relabel ${meta.sample_id}_Derep"
-    }
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: "${meta.sample_id}"
+    cluster = prefix + '.precluster.fasta'
+    uc = prefix + '.precluster.uc'
+
     """
-    vsearch --derep_fulllength $fa \
-    --strand plus \
-    --sizeout \
-    --uc $derep_uc \
-    --output $derep $options
+    vsearch --cluster_size $fa \
+    --threads ${task.cpus} \
+    --id $cluster_id \
+    --uc $uc \
+    --centroids $cluster $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

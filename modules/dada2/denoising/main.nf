@@ -3,21 +3,21 @@ process DADA2_DENOISING {
     label 'process_medium'
     label 'process_long'
 
-    conda "bioconda::bioconductor-dada2=1.28.0"
+    conda 'bioconda::bioconductor-dada2=1.28.0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconductor-dada2:1.28.0--r43hf17093f_0' :
         'biocontainers/bioconductor-dada2:1.28.0--r43hf17093f_0' }"
 
     input:
-    tuple val(meta), path("filtered/*"), path(errormodel)
+    tuple val(meta), path('filtered/*'), path(errormodel)
 
     output:
-    tuple val(meta), path("*.dada.rds")   , emit: denoised
-    tuple val(meta), path("*.seqtab.rds") , emit: seqtab
-    tuple val(meta), path("*.mergers.rds"), emit: mergers
-    tuple val(meta), path("*.log")        , emit: log
-    path "versions.yml"                   , emit: versions
-    path "*.args.txt"                     , emit: args
+    tuple val(meta), path('*.dada.rds')   , emit: denoised
+    tuple val(meta), path('*.seqtab.rds') , emit: seqtab
+    tuple val(meta), path('*.mergers.rds'), emit: mergers
+    tuple val(meta), path('*.log')        , emit: log
+    path 'versions.yml'                   , emit: versions
+    path '*.args.txt'                     , emit: args
 
     when:
     task.ext.when == null || task.ext.when
@@ -25,10 +25,10 @@ process DADA2_DENOISING {
     script:
     def args = task.ext.args ?: [
             'selfConsist = FALSE, priors = character(0), DETECT_SINGLETONS = FALSE, GAPLESS = TRUE, GAP_PENALTY = -8, GREEDY = TRUE, KDIST_CUTOFF = 0.42, MATCH = 5, MAX_CLUST = 0, MAX_CONSIST = 10, MIN_ABUNDANCE = 1, MIN_FOLD = 1, MIN_HAMMING = 1, MISMATCH = -4, OMEGA_A = 1e-40, OMEGA_C = 1e-40, OMEGA_P = 1e-4, PSEUDO_ABUNDANCE = Inf, PSEUDO_PREVALENCE = 2, SSE = 2, USE_KMERS = TRUE, USE_QUALS = TRUE, VECTORIZED_ALIGNMENT = TRUE',
-            params.iontorrent ? "BAND_SIZE = 32, HOMOPOLYMER_GAP_PENALTY = -1" : "BAND_SIZE = 16, HOMOPOLYMER_GAP_PENALTY = NULL",
-            params.sample_inference == "pseudo" ? "pool = \"pseudo\"" :
-                params.sample_inference == "pooled" ? "pool = TRUE" : "pool = FALSE"
-        ].join(',').replaceAll('(,)*$', "")
+            params.iontorrent ? 'BAND_SIZE = 32, HOMOPOLYMER_GAP_PENALTY = -1' : 'BAND_SIZE = 16, HOMOPOLYMER_GAP_PENALTY = NULL',
+            params.sample_inference == 'pseudo' ? 'pool = \"pseudo\"' :
+                params.sample_inference == 'pooled' ? 'pool = TRUE' : 'pool = FALSE'
+        ].join(',').replaceAll('(,)*$', '')
     def args2 = task.ext.args2 ?: ''
     if (!meta.single_end) {
         """

@@ -4,9 +4,8 @@ include { DADA2_QUALITY as DADA2_QUALITY1 }     from './../../../modules/dada2/q
 include { DADA2_QUALITY as DADA2_QUALITY2 }     from './../../../modules/dada2/quality'
 
 ch_versions = Channel.from([])
-        
-workflow DADA2_PREPROCESSING {
 
+workflow DADA2_PREPROCESSING {
     take:
     ch_trimmed_reads
     single_end
@@ -21,48 +20,48 @@ workflow DADA2_PREPROCESSING {
         ch_trimmed_reads
             .map { meta, reads -> [ reads ] }
             .collect()
-            .map { reads -> [ "single_end", reads ] }
+            .map { reads -> [ 'single_end', reads ] }
             .set { ch_all_trimmed_reads }
     } else {
         ch_trimmed_reads
             .map { meta, reads -> [ reads[0] ] }
             .collect()
-            .map { reads -> [ "FW", reads ] }
+            .map { reads -> [ 'FW', reads ] }
             .set { ch_all_trimmed_fw }
         ch_trimmed_reads
             .map { meta, reads -> [ reads[1] ] }
             .collect()
-            .map { reads -> [ "RV", reads ] }
+            .map { reads -> [ 'RV', reads ] }
             .set { ch_all_trimmed_rv }
         ch_all_trimmed_fw
-            .mix ( ch_all_trimmed_rv )
+            .mix(ch_all_trimmed_rv)
             .set { ch_all_trimmed_reads }
     }
 
     ch_DADA2_QUALITY1_SVG = Channel.empty()
-    if ( !params.skip_dada_quality ) {
-        DADA2_QUALITY1 ( ch_all_trimmed_reads.dump(tag: 'into_dada2_quality') )
+    if (!params.skip_dada_quality) {
+        DADA2_QUALITY1(ch_all_trimmed_reads.dump(tag: 'into_dada2_quality'))
         ch_versions = ch_versions.mix(DADA2_QUALITY1.out.versions)
-        DADA2_QUALITY1.out.warning.subscribe { if ( it.baseName.toString().startsWith("WARNING") ) log.warn it.baseName.toString().replace("WARNING ","DADA2_QUALITY1: ") }
+        DADA2_QUALITY1.out.warning.subscribe { if (it.baseName.toString().startsWith('WARNING')) log.warn it.baseName.toString().replace('WARNING ', 'DADA2_QUALITY1: ') }
         ch_DADA2_QUALITY1_SVG = DADA2_QUALITY1.out.svg
     }
 
     //find truncation values in case they are not supplied
-    if ( find_truncation_values ) {
-        FIND_BEST_TRUNCLEN ( DADA2_QUALITY1.out.tsv )
+    if (find_truncation_values) {
+        FIND_BEST_TRUNCLEN(DADA2_QUALITY1.out.tsv)
         FIND_BEST_TRUNCLEN.out.trunc
             .toSortedList()
             .set { ch_trunc }
         ch_versions = ch_versions.mix(FIND_BEST_TRUNCLEN.out.versions.first())
         //add one more warning or reminder that trunclenf and trunclenr were chosen automatically
         ch_trunc.subscribe {
-            if ( "${it[0][1]}".toInteger() + "${it[1][1]}".toInteger() <= 10 ) { log.warn "`--trunclenf` was set to ${it[0][1]} and `--trunclenr` to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
-            else if ( "${it[0][1]}".toInteger() <= 10 ) { log.warn "`--trunclenf` was set to ${it[0][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
-            else if ( "${it[1][1]}".toInteger() <= 10 ) { log.warn "`--trunclenr` was set to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
+            if ("${it[0][1]}".toInteger() + "${it[1][1]}".toInteger() <= 10) { log.warn "`--trunclenf` was set to ${it[0][1]} and `--trunclenr` to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
+            else if ("${it[0][1]}".toInteger() <= 10) { log.warn "`--trunclenf` was set to ${it[0][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
+            else if ("${it[1][1]}".toInteger() <= 10) { log.warn "`--trunclenr` was set to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
             else log.warn "Probably everything is fine, but this is a reminder that `--trunclenf` was set automatically to ${it[0][1]} and `--trunclenr` to ${it[1][1]}. If this doesnt seem reasonable, then please change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr` directly."
         }
     } else {
-        Channel.fromList( [['FW', trunclenf], ['RV', trunclenr]] )
+        Channel.fromList([['FW', trunclenf], ['RV', trunclenr]])
             .toSortedList()
             .set { ch_trunc }
     }
@@ -73,7 +72,7 @@ workflow DADA2_PREPROCESSING {
         ch_trimmed_reads
     )
 
-    DADA2_FILTNTRIM.out.reads_logs_args.map { m,reads,stats,args ->
+    DADA2_FILTNTRIM.out.reads_logs_args.map { m, reads, stats, args ->
         [ m, reads ]
     }.set { ch_reads_filtered }
 
@@ -89,7 +88,7 @@ workflow DADA2_PREPROCESSING {
         .map { meta, reads, logs, args -> [ meta.id ] }
         .collect()
         .subscribe {
-            samples = it.join("\n")
+            samples = it.join('\n')
             if (params.ignore_failed_filtering) {
                 log.warn "The following samples had too few reads (<$params.min_read_counts) after quality filtering with DADA2:\n$samples\nIgnoring failed samples and continue!\n"
             } else {
@@ -100,42 +99,42 @@ workflow DADA2_PREPROCESSING {
     // Break apart the reads and logs so that only the samples
     // which pass filtering are retained
     ch_dada2_filtntrim_results_passed
-        .map{ meta, reads, logs, args -> [meta, reads] }
-        .set{ ch_dada2_filtntrim_reads_passed }
+        .map { meta, reads, logs, args -> [meta, reads] }
+        .set { ch_dada2_filtntrim_reads_passed }
     ch_dada2_filtntrim_results_passed
-        .map{ meta, reads, logs, args -> [meta, logs] }
-        .set{ ch_dada2_filtntrim_logs_passed }
+        .map { meta, reads, logs, args -> [meta, logs] }
+        .set { ch_dada2_filtntrim_logs_passed }
     ch_dada2_filtntrim_results_passed
-        .map{ meta, reads, logs, args -> args }
-        .set{ ch_dada2_filtntrim_args_passed }
+        .map { meta, reads, logs, args -> args }
+        .set { ch_dada2_filtntrim_args_passed }
 
     //plot post-processing, aggregated quality profile for forward and reverse reads separately
     if (single_end) {
         ch_dada2_filtntrim_reads_passed
             .map { meta, reads -> [ reads ] }
             .collect()
-            .map { reads -> [ "single_end", reads ] }
+            .map { reads -> [ 'single_end', reads ] }
             .set { ch_all_preprocessed_reads }
     } else {
         ch_dada2_filtntrim_reads_passed
             .map { meta, reads -> [ reads[0] ] }
             .collect()
-            .map { reads -> [ "FW", reads ] }
+            .map { reads -> [ 'FW', reads ] }
             .set { ch_all_preprocessed_fw }
         ch_dada2_filtntrim_reads_passed
             .map { meta, reads -> [ reads[1] ] }
             .collect()
-            .map { reads -> [ "RV", reads ] }
+            .map { reads -> [ 'RV', reads ] }
             .set { ch_all_preprocessed_rv }
         ch_all_preprocessed_fw
-            .mix ( ch_all_preprocessed_rv )
+            .mix(ch_all_preprocessed_rv)
             .set { ch_all_preprocessed_reads }
     }
 
     ch_DADA2_QUALITY2_SVG = Channel.empty()
-    if ( !params.skip_dada_quality ) {
-        DADA2_QUALITY2 ( ch_all_preprocessed_reads.dump(tag: 'into_dada2_quality2') )
-        DADA2_QUALITY2.out.warning.subscribe { if ( it.baseName.toString().startsWith("WARNING") ) log.warn it.baseName.toString().replace("WARNING ","DADA2_QUALITY2: ") }
+    if (!params.skip_dada_quality) {
+        DADA2_QUALITY2(ch_all_preprocessed_reads.dump(tag: 'into_dada2_quality2'))
+        DADA2_QUALITY2.out.warning.subscribe { if (it.baseName.toString().startsWith('WARNING')) log.warn it.baseName.toString().replace('WARNING ', 'DADA2_QUALITY2: ') }
         ch_DADA2_QUALITY2_SVG = DADA2_QUALITY2.out.svg
     }
 
@@ -148,7 +147,7 @@ workflow DADA2_PREPROCESSING {
                 meta.run = info.run
                 meta.single_end = info.single_end
                 [ meta, reads, info.id ] }
-        .groupTuple(by: 0 )
+        .groupTuple(by: 0)
         .map {
             info, reads, ids ->
                 def meta = [:]
@@ -167,7 +166,7 @@ workflow DADA2_PREPROCESSING {
                 meta.run = info.run
                 meta.single_end = info.single_end
                 [ meta, reads, info.id ] }
-        .groupTuple(by: 0 )
+        .groupTuple(by: 0)
         .map {
             info, reads, ids ->
                 def meta = [:]
@@ -184,4 +183,4 @@ workflow DADA2_PREPROCESSING {
     qc_svg              = ch_DADA2_QUALITY1_SVG.collect()
     qc_svg_preprocessed = ch_DADA2_QUALITY2_SVG.collect()
     versions = ch_versions
-}
+    }

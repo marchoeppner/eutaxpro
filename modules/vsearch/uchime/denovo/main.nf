@@ -1,5 +1,4 @@
 process VSEARCH_UCHIME_DENOVO {
-    
     tag "${meta.sample_id}"
 
     publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
