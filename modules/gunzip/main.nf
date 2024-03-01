@@ -14,17 +14,15 @@ process GUNZIP {
     tuple val(meta), path(zipped)
 
     output:
-    tuple val(meta), path(unzipped), emit: gunzip
+    tuple val(meta), path(prefix), emit: gunzip
     path("versions.yml"), emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: ''
-    
-    unzipped = zipped.getBaseName()
+    def prefix = task.ext.prefix ?: zipped.getBaseName()
 
     """
-    gunzip -c $zipped > $unzipped
+    gunzip $args -c $zipped > $prefix
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

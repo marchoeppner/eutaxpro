@@ -18,11 +18,11 @@ process DADA2_FILTNTRIM {
     task.ext.when == null || task.ext.when
 
     script:
-    def in_and_out  = meta.single_end ? "\"${reads}\", \"${meta.sample_id}.filt.fastq.gz\"" : "\"${reads[0]}\", \"${meta.sample_id}_1.filt.fastq.gz\", \"${reads[1]}\", \"${meta.sample_id}_2.filt.fastq.gz\""
+    def inAndOut  = meta.single_end ? "\"${reads}\", \"${meta.sample_id}.filt.fastq.gz\"" : "\"${reads[0]}\", \"${meta.sample_id}_1.filt.fastq.gz\", \"${reads[1]}\", \"${meta.sample_id}_2.filt.fastq.gz\""
     def outfiles    = meta.single_end ? "\"${meta.sample_id}.filt.fastq.gz\"" : "\"${meta.sample_id}_1.filt.fastq.gz\", \"${meta.sample_id}_2.filt.fastq.gz\""
     def trunclenf   = trunclenf[1].toInteger()
     def trunclenr   = trunclenr[1].toInteger()
-    def trunc_args  = meta.single_end ? "truncLen = $trunclenf" : "truncLen = c($trunclenf, $trunclenr)"
+    def truncArgs  = meta.single_end ? "truncLen = $trunclenf" : "truncLen = c($trunclenf, $trunclenr)"
 
     args = [
         'maxN = 0, truncQ = 2, trimRight = 0, minQ = 0, rm.lowcomplex = 0, orient.fwd = NULL, matchIDs = FALSE, id.sep = "\\\\s", id.field = NULL, n = 1e+05, OMP = TRUE, qualityType = "Auto"',
@@ -34,8 +34,8 @@ process DADA2_FILTNTRIM {
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(dada2))
 
-    out <- filterAndTrim($in_and_out,
-        $trunc_args,
+    out <- filterAndTrim($inAndOut,
+        $truncArgs,
         $args,
         compress = TRUE,
         multithread = $task.cpus,
@@ -53,7 +53,7 @@ process DADA2_FILTNTRIM {
     }
 
     write.table( out, file = "${meta.sample_id}.filter_stats.tsv", sep = "\\t", row.names = FALSE, quote = FALSE, na = '')
-    write.table(paste('filterAndTrim\t$trunc_args','$args',sep=","), file = "filterAndTrim.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
+    write.table(paste('filterAndTrim\t$truncArgs','$args',sep=","), file = "filterAndTrim.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
     writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
     """
 }

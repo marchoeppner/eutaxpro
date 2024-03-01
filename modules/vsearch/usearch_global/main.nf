@@ -1,5 +1,4 @@
 process VSEARCH_USEARCH_GLOBAL {
-    
     tag "${meta.sample_id}"
 
     label 'short_serial'
@@ -10,11 +9,11 @@ process VSEARCH_USEARCH_GLOBAL {
         'quay.io/biocontainers/vsearch:2.27.0--h6a68c12_0' }"
 
     input:
-    tuple val(meta),path(fasta)
-    path(db)
+    tuple val(meta), path(db)
+    path(fastq)
 
     output:
-    tuple val(meta), path(tabbed), emit: fasta
+    tuple val(meta), path('*.tsv'), emit: tab
     path("versions.yml"), emit: versions
 
     script:
@@ -23,7 +22,7 @@ process VSEARCH_USEARCH_GLOBAL {
     tabbed = prefix + '.usearch_global.tsv'
 
     """
-    vsearch --usearch_global $fasta \
+    vsearch --usearch_global $fastq \
     -db $db \
     -otutabout $tabbed $args
 

@@ -8,7 +8,7 @@ nextflow.enable.dsl = 2
 Pipeline
 ===============================
 
-This Pipeline performs taxonomic profiling for eukaryotes from NGS data - for example in food safety analysis. 
+This Pipeline performs taxonomic profiling for eukaryotes from NGS data - for example in food safety analysis.
 
 ### Homepage / git
 git@github.com:marchoeppner/pipeline.git

@@ -1,5 +1,4 @@
 process PTRIMMER {
-
     label 'short_serial'
 
     tag "${meta.sample_id}"

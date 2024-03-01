@@ -27,7 +27,34 @@ process DADA2_ERROR {
             params.pacbio ? 'errorEstimationFunction = PacBioErrfun' : 'errorEstimationFunction = loessErrfun'
         ].join(',').replaceAll('(,)*$', '')
     def seed = task.ext.seed ?: '100'
-    if (!meta.single_end) {
+    if (meta.single_end) {
+        """
+        #!/usr/bin/env Rscript
+        suppressPackageStartupMessages(library(dada2))
+        set.seed($seed) # Initialize random number generator for reproducibility
+
+        fnFs <- sort(list.files(".", pattern = ".filt.fastq.gz", full.names = TRUE))
+
+        sink(file = "${meta.run}.err.log")
+        errF <- learnErrors(fnFs, $args, multithread = $task.cpus, verbose = TRUE)
+        saveRDS(errF, "${meta.run}.err.rds")
+        sink(file = NULL)
+
+        pdf("${meta.run}.err.pdf")
+        plotErrors(errF, nominalQ = TRUE)
+        dev.off()
+        svg("${meta.run}.err.svg")
+        plotErrors(errF, nominalQ = TRUE)
+        dev.off()
+
+        sink(file = "${meta.run}.err.convergence.txt")
+        dada2:::checkConvergence(errF)
+        sink(file = NULL)
+
+        write.table('learnErrors\t$args', file = "learnErrors.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
+        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
+        """
+    } else {
         """
         #!/usr/bin/env Rscript
         suppressPackageStartupMessages(library(dada2))
@@ -63,33 +90,6 @@ process DADA2_ERROR {
 
         sink(file = "${meta.run}_2.err.convergence.txt")
         dada2:::checkConvergence(errR)
-        sink(file = NULL)
-
-        write.table('learnErrors\t$args', file = "learnErrors.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
-        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
-        """
-    } else {
-        """
-        #!/usr/bin/env Rscript
-        suppressPackageStartupMessages(library(dada2))
-        set.seed($seed) # Initialize random number generator for reproducibility
-
-        fnFs <- sort(list.files(".", pattern = ".filt.fastq.gz", full.names = TRUE))
-
-        sink(file = "${meta.run}.err.log")
-        errF <- learnErrors(fnFs, $args, multithread = $task.cpus, verbose = TRUE)
-        saveRDS(errF, "${meta.run}.err.rds")
-        sink(file = NULL)
-
-        pdf("${meta.run}.err.pdf")
-        plotErrors(errF, nominalQ = TRUE)
-        dev.off()
-        svg("${meta.run}.err.svg")
-        plotErrors(errF, nominalQ = TRUE)
-        dev.off()
-
-        sink(file = "${meta.run}.err.convergence.txt")
-        dada2:::checkConvergence(errF)
         sink(file = NULL)
 
         write.table('learnErrors\t$args', file = "learnErrors.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')

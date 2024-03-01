@@ -3,14 +3,10 @@ include { VSEARCH_DEREPFULL }                           from './../../modules/vs
 include { VSEARCH_DEREPFULL as VSEARCH_DEREPFULL_ALL }  from './../../modules/vsearch/derep'
 include { VSEARCH_FASTQFILTER }                         from './../../modules/vsearch/fastqfilter'
 include { VSEARCH_CLUSTER_SIZE }                        from './../../modules/vsearch/cluster_size'
-include { VSEARCH_CLUSTER_SIZE as VSEARCH_CLUSTER_ALL } from './../../modules/vsearch/cluster_size'
 include { VSEARCH_CLUSTER_UNOISE }                      from './../../modules/vsearch/unoise'
 include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vsearch/uchime3/denovo'
 include { VSEARCH_USEARCH_GLOBAL }                      from './../../modules/vsearch/usearch_global'
-
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
-include { VSEARCH_EXTRACT_NONCHIMERIC }                 from './../../modules/vsearch/extract_nonchimeric'
-include { VSEARCH_EXTRACT_NONCHIMERIC as VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE } from './../../modules/vsearch/extract_nonchimeric'
 
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
@@ -23,7 +19,7 @@ workflow VSEARCH_WORKFLOW {
 
     main:
 
-    // Merge PE files
+    // Merge PE files and attach sample names
     VSEARCH_FASTQMERGE(
         reads.map { m, r -> [m, r[0], r[1]] }
     )
@@ -56,21 +52,26 @@ workflow VSEARCH_WORKFLOW {
     )
 
     // We now make OTUs because that is good enough for our purpose
-    VSEARCH_CLUSTER_ALL(
+    VSEARCH_CLUSTER_SIZE(
         VSEARCH_UCHIME3_DENOVO.out.fasta,
         params.vsearch_cluster_id
 
     )
     // We taxonomically map the OTUS
     VSEARCH_SINTAX(
-        VSEARCH_CLUSTER_ALL.out.fasta,
+        VSEARCH_CLUSTER_SIZE.out.fasta,
         sintax_db
     )
 
-    
+    // We genrate the OTU Table with sample IDs
+    VSEARCH_USEARCH_GLOBAL(
+        VSEARCH_CLUSTER_SIZE.out.fasta,
+        VSEARCH_FASTQMERGE.out.fastq.map { m,f -> f }.collectFile(name: 'all.merged.fastq')
+    )
+
     emit:
     tsv = VSEARCH_SINTAX.out.tsv
     versions = ch_versions
-    fasta = VSEARCH_CLUSTER_ALL.out.fasta
+    fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
 }

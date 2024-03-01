@@ -24,7 +24,9 @@ process VSEARCH_FASTQMERGE {
     """
     vsearch --fastq_merge $fwd --reverse $rev \
     --fastqout $merged \
-    --fastq_eeout $args
+    --fastq_eeout \
+    -relabel ${meta.sample_id}. \
+    $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

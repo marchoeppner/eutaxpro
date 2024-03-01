@@ -15,7 +15,7 @@ process VSEARCH_EXTRACT_NONCHIMERIC {
     val(mincov)
 
     output:
-    
+
     tuple val(meta), path(nonchim), emit: fasta
 
     script:
@@ -25,7 +25,7 @@ process VSEARCH_EXTRACT_NONCHIMERIC {
     nonchim = prefix + '.nonchimeric.fasta'
 
     """
-    vsearch_extract_nonchimeric.pl $fasta1 $uc $fasta2 $mincov > $nonchim
+    vsearch_extract_nonchimeric.pl $fasta1 $uc $fasta2 $mincov $args > $nonchim
 
     """
 }

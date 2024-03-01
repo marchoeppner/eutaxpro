@@ -20,8 +20,9 @@ ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_
 
 single_end              = params.single_end
 
-trunclenf               = params.trunclenf ?: 0
-trunclenr               = params.trunclenr ?: 0
+trunc_def               = 0
+trunclenf               = params.trunclenf ?: trunc_def
+trunclenr               = params.trunclenr ?: trunc_def
 
 tools = params.tools ? params.tools.split(',').collect { tool -> clean_tool(tool) } : []
 
@@ -74,7 +75,6 @@ workflow EUTAXPRO {
     ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
 
     if ('vsearch' in tools) {
-
         // Remove PCR primers the right way
         // Dada2 wants hard-clipped reads instead...
         PTRIMMER(

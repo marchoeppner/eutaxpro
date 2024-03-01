@@ -22,7 +22,7 @@ process VSEARCH_FASTXUNIQUES {
     derep = prefix + '.unique.fasta'
 
     """
-    vsearch -fastx_uniques $fa -sizeout -relabel ${meta.sample_id}_Unique -fastaout $derep
+    vsearch -fastx_uniques $fa $args -sizeout -relabel ${meta.sample_id}_Unique -fastaout $derep
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

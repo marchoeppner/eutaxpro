@@ -18,7 +18,7 @@ process VSEARCH_UCHIME_DENOVO {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: meta.sample_id
-    
+
     nonchimera = prefix + '.uchime_denovo.fasta'
     derep_uc = prefix + '.uchime_denovo.uc'
 
@@ -26,7 +26,7 @@ process VSEARCH_UCHIME_DENOVO {
     vsearch --uchime_denovo $fa \
     --sizein \
     --sizeout \
-    --nonchimera $nonchimera
+    --nonchimera $nonchimera $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

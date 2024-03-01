@@ -42,7 +42,11 @@ workflow DADA2_PREPROCESSING {
     if (!params.skip_dada_quality) {
         DADA2_QUALITY1(ch_all_trimmed_reads.dump(tag: 'into_dada2_quality'))
         ch_versions = ch_versions.mix(DADA2_QUALITY1.out.versions)
-        DADA2_QUALITY1.out.warning.subscribe { if (it.baseName.toString().startsWith('WARNING')) log.warn it.baseName.toString().replace('WARNING ', 'DADA2_QUALITY1: ') }
+        DADA2_QUALITY1.out.warning.subscribe { msg ->
+            if (msg.baseName.toString().startsWith('WARNING')) {
+                log.warn msg.baseName.toString().replace('WARNING ', 'DADA2_QUALITY1: ')
+            }
+        }
         ch_DADA2_QUALITY1_SVG = DADA2_QUALITY1.out.svg
     }
 
@@ -54,11 +58,16 @@ workflow DADA2_PREPROCESSING {
             .set { ch_trunc }
         ch_versions = ch_versions.mix(FIND_BEST_TRUNCLEN.out.versions.first())
         //add one more warning or reminder that trunclenf and trunclenr were chosen automatically
-        ch_trunc.subscribe {
-            if ("${it[0][1]}".toInteger() + "${it[1][1]}".toInteger() <= 10) { log.warn "`--trunclenf` was set to ${it[0][1]} and `--trunclenr` to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
-            else if ("${it[0][1]}".toInteger() <= 10) { log.warn "`--trunclenf` was set to ${it[0][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
-            else if ("${it[1][1]}".toInteger() <= 10) { log.warn "`--trunclenr` was set to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`." }
-            else log.warn "Probably everything is fine, but this is a reminder that `--trunclenf` was set automatically to ${it[0][1]} and `--trunclenr` to ${it[1][1]}. If this doesnt seem reasonable, then please change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr` directly."
+        ch_trunc.subscribe { mgs ->
+            if ("${msg[0][1]}".toInteger() + "${msg[1][1]}".toInteger() <= 10) {
+                log.warn "`--trunclenf` was set to ${it[0][1]} and `--trunclenr` to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
+            } else if ("${msg[0][1]}".toInteger() <= 10) {
+                log.warn "`--trunclenf` was set to ${msg[0][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
+            } else if ("${msg[1][1]}".toInteger() <= 10) {
+                log.warn "`--trunclenr` was set to ${msg[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
+            } else {
+                log.warn "Probably everything is fine, but this is a reminder that `--trunclenf` was set automatically to ${msg[0][1]} and `--trunclenr` to ${msg[1][1]}. If this doesnt seem reasonable, then please change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr` directly."
+            }
         }
     } else {
         Channel.fromList([['FW', trunclenf], ['RV', trunclenr]])
@@ -78,8 +87,8 @@ workflow DADA2_PREPROCESSING {
 
     //Filter empty files
     DADA2_FILTNTRIM.out.reads_logs_args
-        .branch {
-            failed: it[0].single_end ? it[1].countFastq() < params.min_read_counts : it[1][0].countFastq() < params.min_read_counts || it[1][1].countFastq() < params.min_read_counts
+        .branch { m, r, l, t ->
+            failed: m.single_end ? r.countFastq() < params.min_read_counts : r[0].countFastq() < params.min_read_counts || r[1].countFastq() < params.min_read_counts
             passed: true
         }
         .set { ch_dada2_filtntrim_results }
@@ -134,7 +143,11 @@ workflow DADA2_PREPROCESSING {
     ch_DADA2_QUALITY2_SVG = Channel.empty()
     if (!params.skip_dada_quality) {
         DADA2_QUALITY2(ch_all_preprocessed_reads.dump(tag: 'into_dada2_quality2'))
-        DADA2_QUALITY2.out.warning.subscribe { if (it.baseName.toString().startsWith('WARNING')) log.warn it.baseName.toString().replace('WARNING ', 'DADA2_QUALITY2: ') }
+        DADA2_QUALITY2.out.warning.subscribe { msg ->
+            if (msg.baseName.toString().startsWith('WARNING')) {
+                log.warn msg.baseName.toString().replace('WARNING ', 'DADA2_QUALITY2: ')
+            }
+        }
         ch_DADA2_QUALITY2_SVG = DADA2_QUALITY2.out.svg
     }
 

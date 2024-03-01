@@ -30,7 +30,32 @@ process DADA2_DENOISING {
                 params.sample_inference == 'pooled' ? 'pool = TRUE' : 'pool = FALSE'
         ].join(',').replaceAll('(,)*$', '')
     def args2 = task.ext.args2 ?: ''
-    if (!meta.single_end) {
+    if (meta.single_end) {
+        """
+        #!/usr/bin/env Rscript
+        suppressPackageStartupMessages(library(dada2))
+
+        errF = readRDS("${errormodel}")
+
+        filtFs <- sort(list.files("./filtered/", pattern = ".fastq.gz", full.names = TRUE))
+
+        #denoising
+        sink(file = "${meta.run}.dada.log")
+        dadaFs <- dada(filtFs, err = errF, $args, multithread = $task.cpus)
+        saveRDS(dadaFs, "${meta.run}.dada.rds")
+        sink(file = NULL)
+
+        #make table
+        seqtab <- makeSequenceTable(dadaFs)
+        saveRDS(seqtab, "${meta.run}.seqtab.rds")
+
+        #dummy file to fulfill output rules
+        saveRDS("dummy", "dummy_${meta.run}.mergers.rds")
+
+        write.table('dada\t$args', file = "dada.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
+        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
+        """
+    } else {
         """
         #!/usr/bin/env Rscript
         suppressPackageStartupMessages(library(dada2))
@@ -57,31 +82,6 @@ process DADA2_DENOISING {
 
         write.table('dada\t$args', file = "dada.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
         write.table('mergePairs\t$args2', file = "mergePairs.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
-        writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
-        """
-    } else {
-        """
-        #!/usr/bin/env Rscript
-        suppressPackageStartupMessages(library(dada2))
-
-        errF = readRDS("${errormodel}")
-
-        filtFs <- sort(list.files("./filtered/", pattern = ".fastq.gz", full.names = TRUE))
-
-        #denoising
-        sink(file = "${meta.run}.dada.log")
-        dadaFs <- dada(filtFs, err = errF, $args, multithread = $task.cpus)
-        saveRDS(dadaFs, "${meta.run}.dada.rds")
-        sink(file = NULL)
-
-        #make table
-        seqtab <- makeSequenceTable(dadaFs)
-        saveRDS(seqtab, "${meta.run}.seqtab.rds")
-
-        #dummy file to fulfill output rules
-        saveRDS("dummy", "dummy_${meta.run}.mergers.rds")
-
-        write.table('dada\t$args', file = "dada.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')
         writeLines(c("\\"${task.process}\\":", paste0("    R: ", paste0(R.Version()[c("major","minor")], collapse = ".")),paste0("    dada2: ", packageVersion("dada2")) ), "versions.yml")
         """
     }

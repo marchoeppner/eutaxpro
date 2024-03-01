@@ -20,8 +20,8 @@ process DADA2_RMCHIMERA {
 
     script:
     def args = task.ext.args ?: 'method="consensus", minSampleFraction = 0.9, ignoreNNegatives = 1, minFoldParentOverAbundance = 2, minParentAbundance = 8, allowOneOff = FALSE, minOneOffParentDistance = 4, maxShift = 16'
-    def no_samples    = meta.id.size()
-    def first_sample  = meta.id.first()
+    def noSamples    = meta.id.size()
+    def firstSample  = meta.id.first()
     """
     #!/usr/bin/env Rscript
     suppressPackageStartupMessages(library(dada2))
@@ -30,7 +30,7 @@ process DADA2_RMCHIMERA {
 
     #remove chimera
     seqtab.nochim <- removeBimeraDenovo(seqtab, $args, multithread=$task.cpus, verbose=TRUE)
-    if ( ${no_samples} == 1 ) { rownames(seqtab.nochim) <- "${first_sample}" }
+    if ( ${noSamples} == 1 ) { rownames(seqtab.nochim) <- "${firstSample}" }
     saveRDS(seqtab.nochim,"${meta.run}.ASVtable.rds")
 
     write.table('removeBimeraDenovo\t$args', file = "removeBimeraDenovo.args.txt", row.names = FALSE, col.names = FALSE, quote = FALSE, na = '')

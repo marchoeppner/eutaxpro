@@ -19,7 +19,7 @@ process CAT_FASTQ {
 
     script:
     def prefix = meta.sample_id
-    def readList = reads instanceof List ? reads.collect { it.toString() } : [reads.toString()]
+    def readList = reads instanceof List ? reads.collect { r -> r.toString() } : [reads.toString()]
 
     def read1 = []
     def read2 = []

@@ -20,14 +20,13 @@ process BIOBLOOMTOOLS_CATEGORIZER {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: ''
+    def prefix = task.ext.prefix ?: "${meta.sample_id}_${meta.library_id}_${meta.readgroup_id}"
 
-    filtered = meta.sample_id + '_' + meta.library_id + '_' + meta.readgroup_id
-    r1_trim = filtered + '_noMatch_1.fq.gz'
-    r2_trim = filtered + '_noMatch_2.fq.gz'
+    r1_trim = prefix + '_noMatch_1.fq.gz'
+    r2_trim = prefix + '_noMatch_2.fq.gz'
 
     """
-    biobloomcategorizer $args -p $filtered -t ${task.cpus} -n --fq --gz_out -i -e -f "${params.bloomfilter}" $r1 $r2
+    biobloomcategorizer $args -p $prefix -t ${task.cpus} -n --fq --gz_out -i -e -f "${params.bloomfilter}" $r1 $r2
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
