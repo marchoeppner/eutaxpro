@@ -1,8 +1,6 @@
 process VSEARCH_DEREPFULL {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'bioconda::vsearch=2.27.0'
@@ -18,18 +16,18 @@ process VSEARCH_DEREPFULL {
     path("versions.yml"), emit: versions
 
     script:
-    derep = meta.sample_id + '.derep.fasta'
-    derep_uc = meta.sample_id + '.uc'
-    options = ''
-    if (!meta.sample_id == 'all') {
-        options = "--relabel ${meta.sample_id}_Derep"
-    }
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: meta.sample_id
+
+    derep = prefix + '.derep.fasta'
+    derep_uc = prefix + '.uc'
+
     """
     vsearch --derep_fulllength $fa \
     --strand plus \
     --sizeout \
     --uc $derep_uc \
-    --output $derep $options
+    --output $derep $arg
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

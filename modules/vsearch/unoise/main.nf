@@ -1,8 +1,6 @@
 process VSEARCH_CLUSTER_UNOISE {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'bioconda::vsearch=2.27.0'

@@ -1,8 +1,6 @@
 process VSEARCH_UCHIME_DENOVO {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'bioconda::vsearch=2.27.0'
@@ -18,8 +16,11 @@ process VSEARCH_UCHIME_DENOVO {
     path("versions.yml"), emit: versions
 
     script:
-    nonchimera = meta.sample_id + '.uchime_denovo.fasta'
-    derep_uc = meta.sample_id + '.uchime_denovo.uc'
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: meta.sample_id
+    
+    nonchimera = prefix + '.uchime_denovo.fasta'
+    derep_uc = prefix + '.uchime_denovo.uc'
 
     """
     vsearch --uchime_denovo $fa \

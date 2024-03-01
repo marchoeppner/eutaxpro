@@ -18,6 +18,9 @@ process GUNZIP {
     path("versions.yml"), emit: versions
 
     script:
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: ''
+    
     unzipped = zipped.getBaseName()
 
     """

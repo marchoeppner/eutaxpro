@@ -1,8 +1,6 @@
 process VSEARCH_FASTQFILTER {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'bioconda::vsearch=2.27.0'
@@ -18,10 +16,13 @@ process VSEARCH_FASTQFILTER {
     path("versions.yml"), emit: versions
 
     script:
-    filtered = fq.getBaseName() + '.filtered.fasta'
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: fq.getBaseName()
+
+    filtered = prefix + '.filtered.fasta'
 
     """
-    vsearch -fastq_filter $fq -fastq_maxee_rate 0.1 -relabel Filtered -fastaout $filtered
+    vsearch -fastq_filter $fq -fastq_maxee_rate 0.1 -relabel Filtered -fastaout $filtered $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

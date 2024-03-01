@@ -74,7 +74,6 @@ workflow EUTAXPRO {
     ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
 
     if ('vsearch' in tools) {
-        ch_db_sintax.view()
 
         // Remove PCR primers the right way
         // Dada2 wants hard-clipped reads instead...

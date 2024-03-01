@@ -1,4 +1,5 @@
-process VSEARCH_FASTXUNIQUES {
+process VSEARCH_USEARCH_GLOBAL {
+    
     tag "${meta.sample_id}"
 
     label 'short_serial'
@@ -9,20 +10,22 @@ process VSEARCH_FASTXUNIQUES {
         'quay.io/biocontainers/vsearch:2.27.0--h6a68c12_0' }"
 
     input:
-    tuple val(meta), path(fa)
+    tuple val(meta),path(fasta)
+    path(db)
 
     output:
-    tuple val(meta), path(derep), emit: fasta
+    tuple val(meta), path(tabbed), emit: fasta
     path("versions.yml"), emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: fa.getBaseName()
-
-    derep = prefix + '.unique.fasta'
+    def prefix = task.ext.prefix ?: "${meta.sample_id}"
+    tabbed = prefix + '.usearch_global.tsv'
 
     """
-    vsearch -fastx_uniques $fa -sizeout -relabel ${meta.sample_id}_Unique -fastaout $derep
+    vsearch --usearch_global $fasta \
+    -db $db \
+    -otutabout $tabbed $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

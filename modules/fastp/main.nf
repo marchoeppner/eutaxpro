@@ -1,8 +1,6 @@
 process FASTP {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/FASTP", mode: 'copy'
-
     label 'short_parallel'
 
     conda 'bioconda::fastp=0.23.4'

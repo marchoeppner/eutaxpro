@@ -6,6 +6,8 @@ include { VSEARCH_CLUSTER_SIZE }                        from './../../modules/vs
 include { VSEARCH_CLUSTER_SIZE as VSEARCH_CLUSTER_ALL } from './../../modules/vsearch/cluster_size'
 include { VSEARCH_CLUSTER_UNOISE }                      from './../../modules/vsearch/unoise'
 include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vsearch/uchime3/denovo'
+include { VSEARCH_USEARCH_GLOBAL }                      from './../../modules/vsearch/usearch_global'
+
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
 include { VSEARCH_EXTRACT_NONCHIMERIC }                 from './../../modules/vsearch/extract_nonchimeric'
 include { VSEARCH_EXTRACT_NONCHIMERIC as VSEARCH_EXTRACT_NONCHIMERIC_PER_SAMPLE } from './../../modules/vsearch/extract_nonchimeric'
@@ -34,24 +36,21 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQFILTER.out.versions)
 
-    // Reduce reads into unique sequences
-    VSEARCH_DEREPFULL(
-        VSEARCH_FASTQFILTER.out.fasta
-    )
-    ch_versions = ch_versions.mix(VSEARCH_DEREPFULL.out.versions)
-
-    VSEARCH_DEREPFULL.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
+    VSEARCH_FASTQFILTER.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
         [ [sample_id: 'all' ], fasta ]
     }.set { all_seqs }
 
+    // Dereplicate the concatenated set of sequences
     VSEARCH_DEREPFULL_ALL(
         all_seqs
     )
 
+    // The initial set of ASUs
     VSEARCH_CLUSTER_UNOISE(
         VSEARCH_DEREPFULL_ALL.out.fasta
     )
 
+    // the denoised and chimera-filtered ASUs
     VSEARCH_UCHIME3_DENOVO(
         VSEARCH_CLUSTER_UNOISE.out.fasta
     )
@@ -68,6 +67,7 @@ workflow VSEARCH_WORKFLOW {
         sintax_db
     )
 
+    
     emit:
     tsv = VSEARCH_SINTAX.out.tsv
     versions = ch_versions

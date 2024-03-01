@@ -1,8 +1,6 @@
 process VSEARCH_EXTRACT_NONCHIMERIC {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'sed=4.7'
@@ -17,10 +15,14 @@ process VSEARCH_EXTRACT_NONCHIMERIC {
     val(mincov)
 
     output:
+    
     tuple val(meta), path(nonchim), emit: fasta
 
     script:
-    nonchim = fasta1.getBaseName() + '.nonchimeric.fasta'
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: fasta1.getBaseName()
+
+    nonchim = prefix + '.nonchimeric.fasta'
 
     """
     vsearch_extract_nonchimeric.pl $fasta1 $uc $fasta2 $mincov > $nonchim

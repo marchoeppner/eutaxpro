@@ -61,6 +61,14 @@ workflow DADA2_WORKFLOW {
         DADA2_RMCHIMERA.out.rds.map { meta, rds -> rds }.collect()
     )
 
+    // Dereplicate
+
+    // Make OTUs
+
+    // Map to taxonomy
+
+    // reconstitute sample content
+
     emit:
     fasta = DADA2_MERGE.out.fasta
     versions = ch_versions

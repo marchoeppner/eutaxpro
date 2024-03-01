@@ -1,8 +1,6 @@
 process VSEARCH_FASTQMERGE {
     tag "${meta.sample_id}"
 
-    publishDir "${params.outdir}/${meta.sample_id}/VSEARCH", mode: 'copy'
-
     label 'short_serial'
 
     conda 'bioconda::vsearch=2.27.0'
@@ -18,12 +16,15 @@ process VSEARCH_FASTQMERGE {
     path("versions.yml"), emit: versions
 
     script:
-    merged = meta.sample_id + '.merged.fastq'
+    def args = task.ext.args ?: ''
+    def prefix = task.ext.prefix ?: meta.sample_id
+
+    merged = prefix + '.merged.fastq'
 
     """
     vsearch --fastq_merge $fwd --reverse $rev \
     --fastqout $merged \
-    --fastq_eeout
+    --fastq_eeout $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
