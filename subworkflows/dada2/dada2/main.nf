@@ -12,7 +12,7 @@ workflow DADA2_WORKFLOW {
     take:
     reads
     single_end
-    find_trancation_values
+    find_truncation_values
     trunclenf
     trunclenr
 

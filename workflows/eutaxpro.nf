@@ -8,23 +8,35 @@ include { FASTP }                       from './../modules/fastp'
 include { CAT_FASTQ }                   from './../modules/cat_fastq'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
-samplesheet             = params.input      ? Channel.fromPath(params.input)                         : Channel.value([])
+// The input sample sheet
+samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
 // Each primer set has a specific ptrimmer config file
 ptrimmer_config         = file(params.references.primers[params.primer_set].ptrimmer_config)
 
+// The gene configured for the primer set
 gene                    = params.references.primers[params.primer_set].gene
 
-ch_db_dada2             = Channel.fromPath(params.references.genes[gene].dada2_db).collect()
-ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db).collect()
+// The taxonomy databases for this gene
+if (params.reference_base) {
+    ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db).collect()
+} else {
+    log.info "No local taxonomy reference specified - downloading on-the-fly instead..."
+    log.info "Consider installing the reference(s) as specified in our documentation!"
+    ch_db_sintax            = Channel.fromPath(file(params.references.genes[gene].sintax_url)).collect()
+}
 
+// PLACE HOLDER: data is single-end?
 single_end              = params.single_end
 
+// List of tool chains to run
+tools = params.tools ? params.tools.split(',').collect { tool -> clean_tool(tool) } : []
+
+// DADA2 options to determine need for automatic truncation
 trunc_def               = 0
 trunclenf               = params.trunclenf ?: trunc_def
 trunclenr               = params.trunclenr ?: trunc_def
-
-tools = params.tools ? params.tools.split(',').collect { tool -> clean_tool(tool) } : []
+find_truncation_values  = false
 
 if (('dada2' in tools) && !single_end && (params.trunclenf == null || params.trunclenr == null)) {
     find_truncation_values = true
@@ -55,6 +67,8 @@ workflow EUTAXPRO {
     FASTP(
         ch_reads_by_platform.illumina
     )
+    ch_versions = ch_versions.mix(FASTP.out.versions)
+    multiqc_files = multiqc_files.mix(FASTP.out.json)
 
     // Split trimmed reads by sample to find multi-lane data set
     FASTP.out.reads.groupTuple().branch { meta, reads ->
@@ -97,11 +111,11 @@ workflow EUTAXPRO {
         DADA2_WORKFLOW(
             ch_reads_for_dada2,
             single_end,
-            find_trancation_values,
+            find_truncation_values,
             trunclenf,
             trunclenr
         )
-        ch_assembled_fasta = ch_assembled_fasta.mix(DADA2_MERGE.out.fasta)
+        ch_assembled_fasta = ch_assembled_fasta.mix(DADA2_WORKFLOW.out.fasta)
         ch_versions = ch_versions.mix(DADA2_WORKFLOW.out.versions)
     }
 

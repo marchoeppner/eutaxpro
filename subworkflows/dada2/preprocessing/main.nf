@@ -58,9 +58,9 @@ workflow DADA2_PREPROCESSING {
             .set { ch_trunc }
         ch_versions = ch_versions.mix(FIND_BEST_TRUNCLEN.out.versions.first())
         //add one more warning or reminder that trunclenf and trunclenr were chosen automatically
-        ch_trunc.subscribe { mgs ->
+        ch_trunc.subscribe { msg ->
             if ("${msg[0][1]}".toInteger() + "${msg[1][1]}".toInteger() <= 10) {
-                log.warn "`--trunclenf` was set to ${it[0][1]} and `--trunclenr` to ${it[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
+                log.warn "`--trunclenf` was set to ${msg[0][1]} and `--trunclenr` to ${msg[1][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
             } else if ("${msg[0][1]}".toInteger() <= 10) {
                 log.warn "`--trunclenf` was set to ${msg[0][1]}, this is too low! Please either change `--trunc_qmin` (and `--trunc_rmin`), or set `--trunclenf` and `--trunclenr`."
             } else if ("${msg[1][1]}".toInteger() <= 10) {

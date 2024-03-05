@@ -1,4 +1,7 @@
 process FASTP {
+
+    tag "${meta.sample_id}"
+    
     label 'short_parallel'
 
     conda 'bioconda::fastp=0.23.4'
@@ -45,7 +48,7 @@ process FASTP {
         r1_trim = r1.getBaseName() + suffix
         r2_trim = r2.getBaseName() + suffix
         """
-        fastp -c --in1 ${r1} --in2 ${r2} \
+        fastp --in1 ${r1} --in2 ${r2} \
         --out1 $r1_trim \
         --out2 $r2_trim \
         --detect_adapter_for_pe \

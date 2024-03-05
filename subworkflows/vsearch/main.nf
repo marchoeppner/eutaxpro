@@ -7,6 +7,7 @@ include { VSEARCH_CLUSTER_UNOISE }                      from './../../modules/vs
 include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vsearch/uchime3/denovo'
 include { VSEARCH_USEARCH_GLOBAL }                      from './../../modules/vsearch/usearch_global'
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
+include { SINTAX_OTU2TAB }                              from "./../../modules/helper/sintax_otu2tab"
 
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
@@ -66,11 +67,15 @@ workflow VSEARCH_WORKFLOW {
     // We genrate the OTU Table with sample IDs
     VSEARCH_USEARCH_GLOBAL(
         VSEARCH_CLUSTER_SIZE.out.fasta,
-        VSEARCH_FASTQMERGE.out.fastq.map { m,f -> f }.collectFile(name: 'all.merged.fastq')
+        VSEARCH_FASTQMERGE.out.fastq.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
+    )
+
+    SINTAX_OTU2TAB(
+        VSEARCH_SINTAX.out.tsv.join(VSEARCH_USEARCH_GLOBAL.out.tab)
     )
 
     emit:
-    tsv = VSEARCH_SINTAX.out.tsv
+    tsv = SINTAX_OTU2TAB.out.tsv
     versions = ch_versions
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
