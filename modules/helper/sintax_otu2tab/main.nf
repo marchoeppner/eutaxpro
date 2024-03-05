@@ -1,5 +1,5 @@
 process SINTAX_OTU2TAB {
-    tag "$meta  "
+    tag "$meta.sample_id"
     label 'process_low'
 
     conda 'conda-forge::perl=5.32'

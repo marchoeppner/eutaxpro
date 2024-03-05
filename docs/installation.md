@@ -1,9 +1,20 @@
 # Installation
 
+## Installing the references
+
+This pipeline requires locally stored genomes in fasta format. To build these, do:
+
+```
+nextflow run marchoeppner/eutaxpro -profile standard,singularity --build_references --run_name build_refs --outdir /path/to/references
+```
+
+If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
+
+The path specified with `--outdir` can then be given to the pipeline during normal execution as `--reference_base`.
+
 ## Site-specific config file
 
-This pipeline requires a site-specific configuration file to be able to talk to your local cluster or compute infrastructure. Nextflow supports a wide
-range of such infrastructures, including Slurm, LSF and SGE - but also Kubernetes and AWS. For more information, see [here](https://www.nextflow.io/docs/latest/executor.html).
+If you run on anything other than a local system, this pipeline requires a site-specific configuration file to be able to talk to your cluster or compute infrastructure. Nextflow supports a wide range of such infrastructures, including Slurm, LSF and SGE - but also Kubernetes and AWS. For more information, see [here](https://www.nextflow.io/docs/latest/executor.html).
 
 Please see conf/lsh.config for an example of how to configure this pipeline for a Slurm queue.
 

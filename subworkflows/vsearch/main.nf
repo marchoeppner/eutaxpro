@@ -34,7 +34,7 @@ workflow VSEARCH_WORKFLOW {
     ch_versions = ch_versions.mix(VSEARCH_FASTQFILTER.out.versions)
 
     VSEARCH_FASTQFILTER.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
-        [ [sample_id: 'all' ], fasta ]
+        [ [sample_id: params.run_name ], fasta ]
     }.set { all_seqs }
 
     // Dereplicate the concatenated set of sequences
@@ -64,7 +64,7 @@ workflow VSEARCH_WORKFLOW {
         sintax_db
     )
 
-    // We genrate the OTU Table with sample IDs
+    // We generate the OTU Table with sample IDs
     VSEARCH_USEARCH_GLOBAL(
         VSEARCH_CLUSTER_SIZE.out.fasta,
         VSEARCH_FASTQMERGE.out.fastq.map { m, f -> f }.collectFile(name: 'all.merged.fastq')

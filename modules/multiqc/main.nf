@@ -16,7 +16,8 @@ process MULTIQC {
     script:
 
     """
-
+    cp ${baseDir}/conf/multiqc_config.yaml . 
+    cp ${baseDir}/assets/pipelinelogo.png .
     multiqc -n ${params.run_name}_multiqc_report .
 
     cat <<-END_VERSIONS > versions.yml

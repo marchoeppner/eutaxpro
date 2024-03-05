@@ -103,8 +103,9 @@ if ($outfile) {
     open(STDOUT, ">$outfile") or die("Cannot open $outfile");
 }
 
-printf "sample\tcount\thits\n";
+printf "sample\treads\thits\n";
 
+# One sample, one row of results
 foreach my $sample (sort keys %matrix) {
 
     my $hits = $matrix{$sample};
@@ -126,14 +127,15 @@ foreach my $sample (sort keys %matrix) {
 
     # And now we print it out with percentages
     printf $sample . "\t" . $sum . "\t";
+    my @all;
     foreach my $hit (sort { $b->{"count"} <=> $a->{"count"} } @row) {
         my $count = $hit->{"count"};
         my $taxon = $hit->{"taxon"};
         my $perc = sprintf( "%.2f", ( $count / $sum )*100 );
         next if ($perc < 1.0);
-        printf "${taxon}:${perc}," ;
+        push(@all,"${taxon}:${perc}");
     }
-
+    printf join(", ",@all);
     printf "\n";
     
 }
@@ -146,6 +148,7 @@ sub decode_taxstring {
 
     foreach my $element (split ",", $taxstring) {
         my ($key,$value) = (split ":", $element);
+        $value =~ s/_[0-9]*// ; 
         $data{$key} = $value ;
     }
     return \%data;
