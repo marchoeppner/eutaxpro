@@ -1,7 +1,10 @@
 process CUSTOM_DUMPSOFTWAREVERSIONS {
     label 'short_serial'
-
-    container 'quay.io/biocontainers/multiqc:1.11--pyhdfd78af_0'
+    
+    conda 'bioconda::multiqc=1.19'
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/multiqc:1.19--pyhdfd78af_0' :
+        'quay.io/biocontainers/multiqc:1.19--pyhdfd78af_0' }"
 
     input:
     path versions

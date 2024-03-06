@@ -11,9 +11,11 @@ a) Without a site-specific config file
 ```
 nextflow run marchoeppner/eutaxpro -profile standard,singularity --input samples.csv --reference_base /path/to/references --run_name pipeline-test
 ```
-where `path_to_references` corresponds to the location in which you have [installed](installation.md) the pipeline references. 
+where `path_to_references` corresponds to the location in which you have [installed](installation.md) the pipeline references (this can be omitted to trigger an on-the-fly temporary installation, but is not recommended in production). 
 
-In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Other options to provision software are:
+In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Available options to provision software are:
+
+`-profile standard,singularity`
 
 `-profile standard,docker` 
 
@@ -62,6 +64,8 @@ An email address to which the MultiQC report is send after pipeline completion. 
 ## `--reference_base` [default = null ]
 
 The location of where the pipeline references are installed on your system. This will typically be pre-set in your site-specific config file and is only needed when you run without one. 
+
+This option can be ommitted to trigger an on-the-fly temporary installation in the work directory. This is however not recommended as it creates unecessary traffic for the hoster of the references. See our (installation guide)[installation.md] to learn how to install the references permanently on your system.
 
 ## `--outdir results` [default = results]
 

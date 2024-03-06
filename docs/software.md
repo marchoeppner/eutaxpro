@@ -6,5 +6,8 @@ Version 0.24, doi: 10.1093/bioinformatics/bty560, [PubMed](https://pubmed.ncbi.n
 **MultiQC**
 Version 1.19, doi: 10.1093/bioinformatics/btw354, [PubMed](https://pubmed.ncbi.nlm.nih.gov/27312411/) [github](https://github.com/MultiQC/MultiQC)
 
-**Samtools**
-Version 1.19, doi: 10.1093/bioinformatics/btp352, [PubMed](https://pubmed.ncbi.nlm.nih.gov/19505943/) [github](https://github.com/samtools/samtools)
+**Vsearch**
+Version 2.27.0, doi: 10.7717/peerj.2584, [PubMed](https://pubmed.ncbi.nlm.nih.gov/27781170/) [github](https://github.com/torognes/vsearch)
+
+**Ptrimmer**
+Version 1.3.3, doi: 10.1186/s12859-019-2854-x, [PubMed](https://pubmed.ncbi.nlm.nih.gov/31077131/) [github](https://github.com/DMU-lilab/pTrimmer)
