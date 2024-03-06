@@ -26,7 +26,7 @@ process PTRIMMER {
 
     if (meta.single_end) {
         """
-        ptrimmer $args -a $amplicon_txt -f $r1 -d $r1_trimmed
+        ptrimmer $args -t single -a $amplicon_txt -f $r1 -d $r1_trimmed
         gzip $r1_trimmed
 
         cat <<-END_VERSIONS > versions.yml

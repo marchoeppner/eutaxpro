@@ -20,8 +20,8 @@ class WorkflowPipeline {
             log.info 'No local taxonomy reference specified - downloading on-the-fly instead...'
             log.info 'Consider installing the reference(s) as specified in our documentation!'
         }
-        if (!params.primer_set) {
-            log.info 'No primer set specified (--primer_set) - cannot work without one ...'
+        if (!params.primer_set && !params.primers) {
+            log.info 'No primer set specified (--primer_set) or fasta file provided (--primers) - exiting...'
             System.exit(1)
         }
     }

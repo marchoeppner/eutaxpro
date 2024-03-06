@@ -28,7 +28,7 @@ In this example, the pipeline will assume it runs on a single computer with the 
 b) with a site-specific config file
 
 ```
-nextflow run marchoeppner/gmo-check -profile lsh --input samples.csv --genome tomato --run_name pipeline-text
+nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv --run_name pipeline-test 
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. 
@@ -46,6 +46,14 @@ S100,ILLUMINA,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects
 
 If the pipeline sees more than one set of reads for a given sample ID, it will concatenate them automatically at the appropriate time. 
 
+Allowed platforms are:
+
+* ILLUMINA (expecting PE Illumina reads)
+* NANOPORE (expecting ONT reads in fastq format)
+* PACBIO (expecting Pacbio CCS reads in fastq format)
+
+Note that only Illumina processing is currently enabled - the rest is "coming soon". 
+
 ### `--primer_set par64_illumina` [default = "par64_illumina"]
 
 The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
@@ -53,6 +61,14 @@ The name of the pre-configured primer set to use for read clipping. At the momen
 Available options:
 
 - par64_illumina
+
+Alternatively, you can specify your own primers.
+
+### `--primers primers.fasta` [ default = null ]
+
+If you wish to use a set of primers not already configured for this pipeline, you can provide it with this option. You will also have to specify which gene this primer set is targetting using the `--gene` option. 
+
+The fasta file should contain only the PCR primer sequences, which will be used as [anchored](https://cutadapt.readthedocs.io/en/stable/guide.html#anchored-5adapters) 5' primers in cutadap for forward and reverse reads.
 
 ### `--run_name Fubar` [default = null]
 
