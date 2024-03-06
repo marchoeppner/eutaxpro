@@ -21,8 +21,6 @@ gene                    = params.references.primers[params.primer_set].gene
 if (params.reference_base) {
     ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db).collect()
 } else {
-    log.info "No local taxonomy reference specified - downloading on-the-fly instead..."
-    log.info "Consider installing the reference(s) as specified in our documentation!"
     ch_db_sintax            = Channel.fromPath(file(params.references.genes[gene].sintax_url)).collect()
 }
 

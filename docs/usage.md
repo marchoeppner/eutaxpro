@@ -4,6 +4,8 @@ This is not a full release. Please note that some things may not work as intende
 
 # Running the pipeline
 
+Please see our [installation guide](installation.md) to learn how to set up this pipeline first. 
+
 A basic execution of the pipeline looks as follows:
 
 a) Without a site-specific config file
@@ -44,13 +46,13 @@ S100,ILLUMINA,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects
 
 If the pipeline sees more than one set of reads for a given sample ID, it will concatenate them automatically at the appropriate time. 
 
-## `--primer_set default` [default = "default"]
+## `--primer_set par64_illumina` [default = "par64_illumina"]
 
-The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 guide lines of the German BVL guide lines under L00.00-184. 
+The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
 
 Available options:
 
-- default
+- par64_illumina
 
 ## `--run_name Fubar` [default = null]
 
@@ -65,7 +67,7 @@ An email address to which the MultiQC report is send after pipeline completion. 
 
 The location of where the pipeline references are installed on your system. This will typically be pre-set in your site-specific config file and is only needed when you run without one. 
 
-This option can be ommitted to trigger an on-the-fly temporary installation in the work directory. This is however not recommended as it creates unecessary traffic for the hoster of the references. See our (installation guide)[installation.md] to learn how to install the references permanently on your system.
+This option can be ommitted to trigger an on-the-fly temporary installation in the work directory. This is however not recommended as it creates unecessary traffic for the hoster of the references. See our [installation guide](installation.md) to learn how to install the references permanently on your system.
 
 ## `--outdir results` [default = results]
 
