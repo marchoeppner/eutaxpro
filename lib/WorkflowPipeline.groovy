@@ -17,14 +17,13 @@ class WorkflowPipeline {
             System.exit(1)
         }
         if (!params.reference_base && !params.build_references) {
-            log.info "No local taxonomy reference specified - downloading on-the-fly instead..."
-            log.info "Consider installing the reference(s) as specified in our documentation!"
+            log.info 'No local taxonomy reference specified - downloading on-the-fly instead...'
+            log.info 'Consider installing the reference(s) as specified in our documentation!'
         }
-        if(!params.primer_set) {
-            log.info "No primer set specified (--primer_set) - cannot work without one ..."
+        if (!params.primer_set) {
+            log.info 'No primer set specified (--primer_set) - cannot work without one ...'
             System.exit(1)
         }
-        
     }
 
 }

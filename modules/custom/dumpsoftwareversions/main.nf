@@ -1,6 +1,6 @@
 process CUSTOM_DUMPSOFTWAREVERSIONS {
     label 'short_serial'
-    
+
     conda 'bioconda::multiqc=1.19'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/multiqc:1.19--pyhdfd78af_0' :

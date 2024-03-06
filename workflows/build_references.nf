@@ -2,7 +2,6 @@ include { GUNZIP } from './../modules/gunzip'
 include { UNZIP } from './../modules/unzip'
 include { STAGE } from './../modules/helper/stage'
 
-
 genes = params.references.genes.keySet()
 
 midori_files = []
@@ -39,4 +38,4 @@ workflow BUILD_REFERENCES {
     STAGE(
         ch_branched_files.gzipped
     )
-}
+    }

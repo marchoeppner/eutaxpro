@@ -8,7 +8,7 @@ process SINTAX_OTU2TAB {
         'ubuntu:20.04' }"
 
     input:
-    tuple val(meta),path(sintax),path(otu_tab)
+    tuple val(meta), path(sintax), path(otu_tab)
 
     output:
     tuple val(meta), path(result), emit: tsv
@@ -16,10 +16,10 @@ process SINTAX_OTU2TAB {
 
     script:
     def args = task.ext.args ?: ''
-    result = meta.sample_id + ".taxonomy_by_sample.tsv"
-    
+    result = meta.sample_id + '.taxonomy_by_sample.tsv'
+
     """
-    sintax_otu2tab.pl --sintax $sintax --otu $otu_tab --outfile $result
+    sintax_otu2tab.pl --sintax $sintax --otu $otu_tab --outfile $result $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

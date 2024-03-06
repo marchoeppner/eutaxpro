@@ -2,7 +2,7 @@ process PORECHOP_PORECHOP {
     tag "$meta.sample_id"
     label 'process_medium'
 
-    conda "porechop=0.2.4"
+    conda 'porechop=0.2.4'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/porechop:0.2.4--py39h7cff6ad_2' :
         'biocontainers/porechop:0.2.4--py39h7cff6ad_2' }"
@@ -11,9 +11,9 @@ process PORECHOP_PORECHOP {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path("*.fastq.gz"), emit: reads
-    tuple val(meta), path("*.log")     , emit: log
-    path "versions.yml"                , emit: versions
+    tuple val(meta), path('*.fastq.gz'), emit: reads
+    tuple val(meta), path('*.log')     , emit: log
+    path 'versions.yml'                , emit: versions
 
     script:
     def args = task.ext.args ?: ''
@@ -30,5 +30,4 @@ process PORECHOP_PORECHOP {
         porechop: \$( porechop --version )
     END_VERSIONS
     """
-
 }

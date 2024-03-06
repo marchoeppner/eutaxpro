@@ -1,7 +1,6 @@
 process FASTP {
-
     tag "${meta.sample_id}"
-    
+
     label 'short_parallel'
 
     conda 'bioconda::fastp=0.23.4'
