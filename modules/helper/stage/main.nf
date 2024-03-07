@@ -1,5 +1,5 @@
 process STAGE {
-    publishDir "${params.outdir}/${meta.target}/${meta.tool}", mode: 'copy'
+    publishDir "${params.outdir}/eutaxpro/${meta.target}/${meta.tool}", mode: 'copy'
 
     tag "${meta.target}|${meta.tool}"
 

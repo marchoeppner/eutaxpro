@@ -4,7 +4,7 @@ include { MULTIQC }                     from './../modules/multiqc/main'
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { DADA2_WORKFLOW }              from './../subworkflows/dada2/dada2'
 include { FASTP }                       from './../modules/fastp'
-include { CUTADAPT }                    from './../modules/cutadapt'
+include { PTRIMMER }                    from './../modules/ptrimmer'
 include { CAT_FASTQ }                   from './../modules/cat_fastq'
 include { PORECHOP_PORECHOP }           from './../modules/porechop/porechop'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
@@ -12,17 +12,16 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 // The input sample sheet
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
-// Primer sequences are either pre-configured or can be supplied by user
+// Primer sets are either pre-configured or can be supplied by user
 if (params.primer_set) {
-    ch_primers              = Channel.fromPath(file(params.references.primers[params.primer_set].fasta, checkIfExits: true)).collect()
+    ch_ptrimmer_config      = Channel.fromPath(file(params.references.primers[params.primer_set].ptrimmer_config, checkIfExits: true)).collect()
+    gene                    = params.references.primers[params.primer_set].gene
 } else if (params.primers) {
-    ch_primers              = Channel.fromPath(file(params.primers, checkIfExists: true)).collect()
+    ch_ptrimmer_config      = Channel.fromPath(file(params.primers, checkIfExists: true)).collect()
+    gene                    = params.gene
 } else {
-    ch_primers              = Channel.from([])
-} 
-
-// The gene configured for the primer set
-gene                    ? params.gene : params.references.primers[params.primer_set].gene
+    log.info 'No primer information available - this should not happen...'
+}
 
 // The taxonomy databases for this gene
 if (params.reference_base) {
@@ -99,20 +98,17 @@ workflow EUTAXPRO {
 
     ch_illumina_trimmed = ch_reads_illumina.single.mix(CAT_FASTQ.out.reads)
 
-    // Trim PCR primers with CUTADAPT
-    CUTADAPT(
-        ch_illumina_trimmed,
-        ch_primers
-    )
-    ch_versions = ch_versions.mix(CUTADAPT.out.versions)
-
-    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(CUTADAPT.out.reads)
-    ch_reads_for_dada2 = ch_reads_for_dada2.mix(CUTADAPT.out.reads)
+    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(ch_illumina_trimmed)
+    ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
 
     if ('vsearch' in tools) {
-        
-        VSEARCH_WORKFLOW(
+        PTRIMMER(
             ch_reads_for_vsearch,
+            ch_ptrimmer_config
+        )
+
+        VSEARCH_WORKFLOW(
+            PTRIMMER.out.reads,
             ch_db_sintax
 
         )

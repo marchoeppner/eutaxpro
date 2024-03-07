@@ -19,8 +19,8 @@ workflow VSEARCH_WORKFLOW {
     sintax_db
 
     main:
-   
-    reads.branch { m,r ->
+
+    reads.branch { m, r ->
         paired: !m.single_end
         unpaired: m.single_end
     }.set { ch_trimmed_reads }
@@ -34,7 +34,7 @@ workflow VSEARCH_WORKFLOW {
     // paired and unpaired reads after optional merging and read name tagging
     // we now have [ meta, fastq ]
     ch_merged_reads = VSEARCH_FASTQMERGE.out.fastq
-    
+
     // Files merged reads using static parameters
     // This is not ideal and could be improved!
     VSEARCH_FASTQFILTER(
@@ -88,4 +88,4 @@ workflow VSEARCH_WORKFLOW {
     versions = ch_versions
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
-}
+    }

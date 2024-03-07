@@ -21,8 +21,11 @@ class WorkflowPipeline {
             log.info 'Consider installing the reference(s) as specified in our documentation!'
         }
         if (!params.primer_set && !params.primers) {
-            log.info 'No primer set specified (--primer_set) or fasta file provided (--primers) - exiting...'
+            log.info 'No primer set specified (--primer_set) or user-supplied primer definition (--primers). Exiting...'
             System.exit(1)
+        }
+        if (params.primers && !params.gene || !params.primers && params.gene) {
+            log.info 'When providing user-defined primer sets, both the --gene and the --primers argument are needed. Exiting....'
         }
     }
 
