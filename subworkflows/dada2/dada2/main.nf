@@ -7,6 +7,7 @@ include { DADA2_DENOISING }             from './../../../modules/dada2/denoising
 include { DADA2_RMCHIMERA }             from './../../../modules/dada2/rmchimera'
 
 ch_versions = Channel.from([])
+ch_qc       = Channel.from([])
 
 workflow DADA2_WORKFLOW {
     take:
@@ -28,6 +29,7 @@ workflow DADA2_WORKFLOW {
     )
     ch_filt_reads   = DADA2_PREPROCESSING.out.reads
     ch_versions     = ch_versions.mix(DADA2_PREPROCESSING.out.versions)
+    ch_qc           = ch_qc.mix(DADA2_PREPROCESSING.out.qc_svg)
 
     // Model read errors per sample
     DADA2_ERROR(
@@ -71,5 +73,6 @@ workflow DADA2_WORKFLOW {
 
     emit:
     fasta = DADA2_MERGE.out.fasta
+    qc = ch_qc
     versions = ch_versions
 }

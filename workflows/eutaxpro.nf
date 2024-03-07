@@ -63,6 +63,7 @@ workflow EUTAXPRO {
     // Branch input reads by sequencing technology
     INPUT_CHECK.out.reads.branch { m, r ->
         illumina: m.platform == 'ILLUMINA'
+        torrent: m.platform = 'TORRENT'
         nanopore: m.platform == 'NANOPORE'
         pacbio: m.platform == 'PACBIO'
     }.set { ch_reads_by_platform }
@@ -106,11 +107,11 @@ workflow EUTAXPRO {
             ch_reads_for_vsearch,
             ch_ptrimmer_config
         )
+        ch_versions = ch_versions.mix(PTRIMMER.out.versions)
 
         VSEARCH_WORKFLOW(
             PTRIMMER.out.reads,
             ch_db_sintax
-
         )
         multiqc_files = multiqc_files.mix(VSEARCH_WORKFLOW.out.qc)
         ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
@@ -127,6 +128,7 @@ workflow EUTAXPRO {
         )
         ch_assembled_fasta = ch_assembled_fasta.mix(DADA2_WORKFLOW.out.fasta)
         ch_versions = ch_versions.mix(DADA2_WORKFLOW.out.versions)
+        multiqc_files = multiqc_files.mix(DADA2_WORKFLOW.out.qc)
     }
 
     // Create list of software packages used

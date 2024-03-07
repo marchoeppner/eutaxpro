@@ -51,8 +51,9 @@ Allowed platforms are:
 * ILLUMINA (expecting PE Illumina reads)
 * NANOPORE (expecting ONT reads in fastq format)
 * PACBIO (expecting Pacbio CCS reads in fastq format)
+* TORRENT (expecting single-end IonTorrent reads in fastq format)
 
-Note that only Illumina processing is currently enabled - the rest is "coming soon". 
+Note that only Illumina processing is currently enabled - the rest is "coming eventually". 
 
 ### `--primer_set par64_illumina` [default = "par64_illumina"]
 
@@ -60,15 +61,24 @@ The name of the pre-configured primer set to use for read clipping. At the momen
 
 Available options:
 
-- par64_illumina
+- par64_illumina (German BVL L00.00-184)
 
-Alternatively, you can specify your own primers.
+Alternatively, you can specify your own primers as described in the following.
 
-### `--primers primers.fasta` [ default = null ]
+### `--primers primers.txt` [ default = null ]
 
-If you wish to use a set of primers not already configured for this pipeline, you can provide it with this option. You will also have to specify which gene this primer set is targetting using the `--gene` option. 
+If you wish to use a set of primers not already configured for this pipeline, you can provide it with this option. You will also have to specify which mitochondrial gene this primer set is targeting using the `--gene` option described elsewhere. 
 
-The fasta file should contain only the PCR primer sequences, which will be used as [anchored](https://cutadapt.readthedocs.io/en/stable/guide.html#anchored-5adapters) 5' primers in cutadap for forward and reverse reads.
+This text file will be read by [Ptrimmer](https://pubmed.ncbi.nlm.nih.gov/31077131/) to remove PCR primers from the adapter-clipped reads. Please see the Ptrimmer [documentation](https://github.com/DMU-lilab/pTrimmer) on how to create such a config file or look at the [example](../assets/ptrimmer/par64_illumina.txt) included with this pipeline. 
+
+### `--gene` [default = null]
+
+If you do not use a pre-configured primer set, you will also need to tell the pipeline which mitochondrial gene you are targeting. Available options are:
+
+- srrna
+- lrrna
+- co1
+- cytb
 
 ### `--run_name Fubar` [default = null]
 

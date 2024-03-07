@@ -40,7 +40,7 @@ where hits are a sorted list of identified taxa and their respective percentages
 
 This folder contains the various intermediate processing outputs and is mostly there for debugging purposes. 
 
-</summary>
+</dtails>
 
 ## Pipeline run metrics
 
@@ -55,4 +55,4 @@ This folder contains the pipeline run metrics
 - pipeline_timeline.html - chronological report of compute tasks and their duration
 - pipeline_trace.txt - Detailed trace log of all processes and their various metrics
 
-</summary>
+</details>
