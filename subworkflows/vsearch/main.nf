@@ -20,11 +20,20 @@ workflow VSEARCH_WORKFLOW {
 
     main:
 
+    reads.branch { m, r ->
+        paired: !m.single_end
+        unpaired: m.single_end
+    }.set { ch_trimmed_reads }
+
     // Merge PE files and attach sample names
     VSEARCH_FASTQMERGE(
-        reads.map { m, r -> [m, r[0], r[1]] }
+        ch_trimmed_reads.paired.map { m, r -> [m, r[0], r[1]] }
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQMERGE.out.versions)
+
+    // paired and unpaired reads after optional merging and read name tagging
+    // we now have [ meta, fastq ]
+    ch_merged_reads = VSEARCH_FASTQMERGE.out.fastq
 
     // Files merged reads using static parameters
     // This is not ideal and could be improved!
@@ -67,7 +76,7 @@ workflow VSEARCH_WORKFLOW {
     // We generate the OTU Table with sample IDs
     VSEARCH_USEARCH_GLOBAL(
         VSEARCH_CLUSTER_SIZE.out.fasta,
-        VSEARCH_FASTQMERGE.out.fastq.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
+        ch_merged_reads.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
     )
 
     SINTAX_OTU2TAB(
@@ -79,4 +88,4 @@ workflow VSEARCH_WORKFLOW {
     versions = ch_versions
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
-}
+    }

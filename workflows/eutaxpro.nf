@@ -3,19 +3,25 @@ include { INPUT_CHECK }                 from './../modules/input_check'
 include { MULTIQC }                     from './../modules/multiqc/main'
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { DADA2_WORKFLOW }              from './../subworkflows/dada2/dada2'
-include { PTRIMMER }                    from './../modules/ptrimmer'
 include { FASTP }                       from './../modules/fastp'
+include { PTRIMMER }                    from './../modules/ptrimmer'
 include { CAT_FASTQ }                   from './../modules/cat_fastq'
+include { PORECHOP_PORECHOP }           from './../modules/porechop/porechop'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
 // The input sample sheet
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
-// Each primer set has a specific ptrimmer config file
-ptrimmer_config         = file(params.references.primers[params.primer_set].ptrimmer_config)
-
-// The gene configured for the primer set
-gene                    = params.references.primers[params.primer_set].gene
+// Primer sets are either pre-configured or can be supplied by user
+if (params.primer_set) {
+    ch_ptrimmer_config      = Channel.fromPath(file(params.references.primers[params.primer_set].ptrimmer_config, checkIfExits: true)).collect()
+    gene                    = params.references.primers[params.primer_set].gene
+} else if (params.primers) {
+    ch_ptrimmer_config      = Channel.fromPath(file(params.primers, checkIfExists: true)).collect()
+    gene                    = params.gene
+} else {
+    log.info 'No primer information available - this should not happen...'
+}
 
 // The taxonomy databases for this gene
 if (params.reference_base) {
@@ -57,11 +63,21 @@ workflow EUTAXPRO {
     // Branch input reads by sequencing technology
     INPUT_CHECK.out.reads.branch { m, r ->
         illumina: m.platform == 'ILLUMINA'
+        torrent: m.platform = 'TORRENT'
         nanopore: m.platform == 'NANOPORE'
         pacbio: m.platform == 'PACBIO'
     }.set { ch_reads_by_platform }
     // channel: [[ sample_id: xxx, platform: xxx ], [ reads ] ]
 
+    // trim nanopore reads
+    PORECHOP_PORECHOP(
+        ch_reads_by_platform.nanopore
+    )
+    ch_versions = ch_versions.mix(PORECHOP_PORECHOP.out.versions)
+    multiqc_files = multiqc_files.mix(PORECHOP_PORECHOP.out.log)
+    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(PORECHOP_PORECHOP.out.reads)
+
+    // trim illumina reads
     FASTP(
         ch_reads_by_platform.illumina
     )
@@ -87,18 +103,15 @@ workflow EUTAXPRO {
     ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
 
     if ('vsearch' in tools) {
-        // Remove PCR primers the right way
-        // Dada2 wants hard-clipped reads instead...
         PTRIMMER(
             ch_reads_for_vsearch,
-            ptrimmer_config
+            ch_ptrimmer_config
         )
         ch_versions = ch_versions.mix(PTRIMMER.out.versions)
 
         VSEARCH_WORKFLOW(
             PTRIMMER.out.reads,
             ch_db_sintax
-
         )
         multiqc_files = multiqc_files.mix(VSEARCH_WORKFLOW.out.qc)
         ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
@@ -115,6 +128,7 @@ workflow EUTAXPRO {
         )
         ch_assembled_fasta = ch_assembled_fasta.mix(DADA2_WORKFLOW.out.fasta)
         ch_versions = ch_versions.mix(DADA2_WORKFLOW.out.versions)
+        multiqc_files = multiqc_files.mix(DADA2_WORKFLOW.out.qc)
     }
 
     // Create list of software packages used

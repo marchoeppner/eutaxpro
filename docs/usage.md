@@ -28,7 +28,7 @@ In this example, the pipeline will assume it runs on a single computer with the 
 b) with a site-specific config file
 
 ```
-nextflow run marchoeppner/gmo-check -profile lsh --input samples.csv --genome tomato --run_name pipeline-text
+nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv --run_name pipeline-test 
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. 
@@ -46,13 +46,39 @@ S100,ILLUMINA,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects
 
 If the pipeline sees more than one set of reads for a given sample ID, it will concatenate them automatically at the appropriate time. 
 
+Allowed platforms are:
+
+* ILLUMINA (expecting PE Illumina reads)
+* NANOPORE (expecting ONT reads in fastq format)
+* PACBIO (expecting Pacbio CCS reads in fastq format)
+* TORRENT (expecting single-end IonTorrent reads in fastq format)
+
+Note that only Illumina processing is currently enabled - the rest is "coming eventually". 
+
 ### `--primer_set par64_illumina` [default = "par64_illumina"]
 
 The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
 
 Available options:
 
-- par64_illumina
+- par64_illumina (German BVL L00.00-184)
+
+Alternatively, you can specify your own primers as described in the following.
+
+### `--primers primers.txt` [ default = null ]
+
+If you wish to use a set of primers not already configured for this pipeline, you can provide it with this option. You will also have to specify which mitochondrial gene this primer set is targeting using the `--gene` option described elsewhere. 
+
+This text file will be read by [Ptrimmer](https://pubmed.ncbi.nlm.nih.gov/31077131/) to remove PCR primers from the adapter-clipped reads. Please see the Ptrimmer [documentation](https://github.com/DMU-lilab/pTrimmer) on how to create such a config file or look at the [example](../assets/ptrimmer/par64_illumina.txt) included with this pipeline. 
+
+### `--gene` [default = null]
+
+If you do not use a pre-configured primer set, you will also need to tell the pipeline which mitochondrial gene you are targeting. Available options are:
+
+- srrna
+- lrrna
+- co1
+- cytb
 
 ### `--run_name Fubar` [default = null]
 

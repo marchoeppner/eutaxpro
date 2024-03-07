@@ -21,7 +21,7 @@ def fastq_channel(LinkedHashMap row) {
     meta = [:]
     meta.sample_id    = row.sample_id
     meta.platform     = row.platform
-    meta.single_end   = false
+    meta.single_end   = true
     meta.run          = 'DUMMY'
 
     valid_platforms = [ 'ILLUMINA', 'NANOPORE', 'PACBIO']
@@ -37,6 +37,7 @@ def fastq_channel(LinkedHashMap row) {
         if (!file(row.R2).exists()) {
             exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.R2}"
         }
+        meta.single_end = false
         array = [ meta, [ file(row.R1), file(row.R2)] ]
     } else {
         array = [ meta, [ file(row.R1)] ]
