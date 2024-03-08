@@ -3,11 +3,12 @@ include { INPUT_CHECK }                 from './../modules/input_check'
 include { MULTIQC }                     from './../modules/multiqc/main'
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { DADA2_WORKFLOW }              from './../subworkflows/dada2/dada2'
+include { REMOVE_PCR_PRIMERS }          from './../subworkflows/remove_pcr_primers'
 include { FASTP }                       from './../modules/fastp'
-include { PTRIMMER }                    from './../modules/ptrimmer'
 include { CAT_FASTQ }                   from './../modules/cat_fastq'
 include { PORECHOP_PORECHOP }           from './../modules/porechop/porechop'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
+
 
 // The input sample sheet
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
@@ -16,14 +17,23 @@ samplesheet             = params.input ? Channel.fromPath(file(params.input, che
 if (params.primer_set) {
     ch_ptrimmer_config      = Channel.fromPath(file(params.references.primers[params.primer_set].ptrimmer_config, checkIfExits: true)).collect()
     gene                    = params.references.primers[params.primer_set].gene
-} else if (params.primers) {
-    ch_ptrimmer_config      = Channel.fromPath(file(params.primers, checkIfExists: true)).collect()
+    ch_primers              = Channel.fromPath(file(params.references.primers[params.primer_set].fasta, checkIfExits: true)).collect()
+    ch_primers_rc           = Channel.fromPath(file(params.references.primers[params.primer_set].fasta, checkIfExits: true)).collectFile(name: 'primers_rc.fasta')
+} else if (params.primers_txt) {
+    ch_ptrimmer_config      = Channel.fromPath(file(params.primers_txt, checkIfExists: true)).collect()
+    gene                    = params.gene
+    ch_primers              = Channel.from([])
+    ch_primers_rc           = Channel.from([])
+} else if (params.primers_fa) {
+    ch_ptrimmer_config      = Channel.from([])
+    ch_primers              = Channel.fromPath(file(params.primers_fa, checkIfExists: true )).collect()
+    ch_primers_rc           = Channel.fromPath(file(params.primers_fa, checkIfExists: true )).collectFile(name: 'primers_rc.fasta')
     gene                    = params.gene
 } else {
     log.info 'No primer information available - this should not happen...'
 }
 
-// The taxonomy databases for this gene
+// The taxonomy database for this gene
 if (params.reference_base) {
     ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db).collect()
 } else {
@@ -99,18 +109,23 @@ workflow EUTAXPRO {
 
     ch_illumina_trimmed = ch_reads_illumina.single.mix(CAT_FASTQ.out.reads)
 
-    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(ch_illumina_trimmed)
     ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
 
-    if ('vsearch' in tools) {
-        PTRIMMER(
-            ch_reads_for_vsearch,
-            ch_ptrimmer_config
-        )
-        ch_versions = ch_versions.mix(PTRIMMER.out.versions)
+    // Remove PCR primers
+    REMOVE_PCR_PRIMERS(
+        ch_illumina_trimmed,
+        ch_ptrimmer_config,
+        ch_primers,
+        ch_primers_rc
+    )
+    ch_versions = ch_versions.mix(REMOVE_PCR_PRIMERS.out.versions)
+    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(REMOVE_PCR_PRIMERS.out.reads)
 
+    if ('vsearch' in tools) {
+    
+        // Turn cleaned reads into a taxonomic information with VSearch
         VSEARCH_WORKFLOW(
-            PTRIMMER.out.reads,
+            ch_reads_for_vsearch,
             ch_db_sintax
         )
         multiqc_files = multiqc_files.mix(VSEARCH_WORKFLOW.out.qc)

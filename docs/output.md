@@ -40,7 +40,7 @@ where hits are a sorted list of identified taxa and their respective percentages
 
 This folder contains the various intermediate processing outputs and is mostly there for debugging purposes. 
 
-</dtails>
+</details>
 
 ## Pipeline run metrics
 

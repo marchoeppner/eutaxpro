@@ -55,7 +55,7 @@ Allowed platforms are:
 
 Note that only Illumina processing is currently enabled - the rest is "coming eventually". 
 
-### `--primer_set par64_illumina` [default = "par64_illumina"]
+### `--primer_set ` [default = null]
 
 The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
 
@@ -65,11 +65,19 @@ Available options:
 
 Alternatively, you can specify your own primers as described in the following.
 
-### `--primers primers.txt` [ default = null ]
+### `--primers_txt ` [ default = null ]
 
 If you wish to use a set of primers not already configured for this pipeline, you can provide it with this option. You will also have to specify which mitochondrial gene this primer set is targeting using the `--gene` option described elsewhere. 
 
 This text file will be read by [Ptrimmer](https://pubmed.ncbi.nlm.nih.gov/31077131/) to remove PCR primers from the adapter-clipped reads. Please see the Ptrimmer [documentation](https://github.com/DMU-lilab/pTrimmer) on how to create such a config file or look at the [example](../assets/ptrimmer/par64_illumina.txt) included with this pipeline. 
+
+Briefly, the file is a simple text format with each row representing one pair of primers, as follows:
+
+```
+FORWARD_PRIMER_SEQ  REVERSE_PRIMER_SEQ  EXPECTED_PRODUCT_SIZE   NAME_OF_PRIMER
+```
+
+Note that the columns are tab-separated. The expected product size should be roughly correct, but doesn't need to accurate to the base. The primer sequences should represent the exact primer binding sequence. If you use primers with overhanging ends for e.g., downstream ligation, these overhanging ends must not be part of the sequence listed here. Also note that Ptrimmer does not understand degenerate primer sequences. If this is an issue, please let us know. 
 
 ### `--gene` [default = null]
 
@@ -108,3 +116,42 @@ The minimum amount of coverage required for an OTU to be created from the read d
 
 ### `--vsearch_cluster_id` [ default = 5 ]
 The percentage similarity for ASUs to be collapsed into OTUs. If you set this to 100, ASUs will not be collapsed at all, which will generate a higher resolution call set at the cost of added noise. 
+
+### Using Cutadapt instead of Ptrimmer
+
+Using Cutadapt is discouraged for most users as it requires more configuration and knowledge of your read data. It may thus not yield optimal results in all circumstances. It does however support degenerate primer sequences, which Ptrimmer does not. 
+
+Some possible usage examples:
+
+```
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --primer_set par64_illumina --cutadapt --run_name cutadapt-test
+```
+
+This example uses a built-in primer set but performs PCR primer site removal with Cutadapt instead of Ptrimmer. 
+
+```
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --cutadapt --primers_fa my_primers.fasta --gene srrna --run_name cutadapt-test
+```
+
+This example uses your custom primers, performs PCR primer site removal with cutadapt and performs taxonomic profiling against the srrna database. 
+
+```
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --primer_set par64_illumina --cutadapt --cutadapt_trim_3p --run_name cutadapt-test
+```
+
+This example will additionally reverse complement your primer sequences and check for primer binding sites at both ends of each read. 
+
+#### `--cutadapt` [ default = false ]
+
+Use Cutadapt instead of Ptrimmer. 
+
+#### `--cutadapt_trim_3p` [ default = false ]
+Use this option if you know that your read length is as long or longer than your PCR product. In this case, the reads will carry both the forward and reverse primer site - something that Cutadapt will normally fail to detect. 
+
+#### `--primers_fa` [ default = null ]
+Your primer sequences in FASTA format. There is no need to provide reverse-complemented sequences here if you wish to use `--cutadapt_trim_3p`, since the pipeline will do that automatically. 
+
+This option requires that you also specify a valid gene name (see above) so that the pipeline knows which database to use for taxonomic profiling. 
+
+
+
