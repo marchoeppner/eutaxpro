@@ -148,6 +148,9 @@ Use Cutadapt instead of Ptrimmer.
 #### `--cutadapt_trim_3p` [ default = false ]
 Use this option if you know that your read length is as long or longer than your PCR product. In this case, the reads will carry both the forward and reverse primer site - something that Cutadapt will normally fail to detect. 
 
+#### `--cutadapt_options` [ default = "" ]
+Any additional options you feel should be passed to Cutadapt. Use at your own risk. 
+
 #### `--primers_fa` [ default = null ]
 Your primer sequences in FASTA format. There is no need to provide reverse-complemented sequences here if you wish to use `--cutadapt_trim_3p`, since the pipeline will do that automatically. 
 

@@ -9,7 +9,6 @@ include { CAT_FASTQ }                   from './../modules/cat_fastq'
 include { PORECHOP_PORECHOP }           from './../modules/porechop/porechop'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
 
-
 // The input sample sheet
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
@@ -26,8 +25,8 @@ if (params.primer_set) {
     ch_primers_rc           = Channel.from([])
 } else if (params.primers_fa) {
     ch_ptrimmer_config      = Channel.from([])
-    ch_primers              = Channel.fromPath(file(params.primers_fa, checkIfExists: true )).collect()
-    ch_primers_rc           = Channel.fromPath(file(params.primers_fa, checkIfExists: true )).collectFile(name: 'primers_rc.fasta')
+    ch_primers              = Channel.fromPath(file(params.primers_fa, checkIfExists: true)).collect()
+    ch_primers_rc           = Channel.fromPath(file(params.primers_fa, checkIfExists: true)).collectFile(name: 'primers_rc.fasta')
     gene                    = params.gene
 } else {
     log.info 'No primer information available - this should not happen...'
@@ -122,7 +121,6 @@ workflow EUTAXPRO {
     ch_reads_for_vsearch = ch_reads_for_vsearch.mix(REMOVE_PCR_PRIMERS.out.reads)
 
     if ('vsearch' in tools) {
-    
         // Turn cleaned reads into a taxonomic information with VSearch
         VSEARCH_WORKFLOW(
             ch_reads_for_vsearch,

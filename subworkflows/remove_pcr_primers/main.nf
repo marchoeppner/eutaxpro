@@ -5,7 +5,6 @@ include { PTRIMMER }                    from './../../modules/ptrimmer'
 ch_versions = Channel.from([])
 
 workflow REMOVE_PCR_PRIMERS {
-
     take:
     reads
     ch_ptrimmer_config
@@ -15,7 +14,6 @@ workflow REMOVE_PCR_PRIMERS {
     main:
     // Allow use of cutadapt if need be
     if (params.cutadapt) {
-
         if (params.cutadapt_trim_3p) {
             FASTX_REVERSE_COMPLEMENT(
                 ch_primers

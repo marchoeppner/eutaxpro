@@ -16,8 +16,8 @@ class WorkflowPipeline {
             log.info "The primer set ${params.primer_set} is not currently configured."
             System.exit(1)
         }
-        if (!params.primer_set && !params.gene ) {
-            log.info "You have to specify which gene you are targeting if you do not use a built-in primer set (--gene)"
+        if (!params.primer_set && !params.gene) {
+            log.info 'You have to specify which gene you are targeting if you do not use a built-in primer set (--gene)'
             System.exit(1)
         }
         if (!params.reference_base && !params.build_references) {
@@ -29,7 +29,7 @@ class WorkflowPipeline {
             System.exit(1)
         }
         if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
-            log.info "No primer information provided, exiting..."
+            log.info 'No primer information provided, exiting...'
             System.exit(1)
         }
     }

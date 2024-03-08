@@ -1,5 +1,4 @@
 process FASTX_REVERSE_COMPLEMENT {
-
     label 'short_serial'
 
     conda 'bioconda::fastx_toolkit=0.0.14'
@@ -18,10 +17,10 @@ process FASTX_REVERSE_COMPLEMENT {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: fa.getBaseName()
 
-    fasta_rc = prefix + ".rc.fasta"
+    fasta_rc = prefix + '.rc.fasta'
 
     """
-    fastx_reverse_complement -i $fa -o $fasta_rc
+    fastx_reverse_complement $args -i $fa -o $fasta_rc
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
