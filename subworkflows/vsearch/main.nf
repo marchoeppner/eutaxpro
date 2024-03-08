@@ -50,16 +50,19 @@ workflow VSEARCH_WORKFLOW {
     VSEARCH_DEREPFULL_ALL(
         all_seqs
     )
+    ch_versions = ch_versions.mix(VSEARCH_DEREPFULL_ALL.out.versions)
 
     // The initial set of ASUs
     VSEARCH_CLUSTER_UNOISE(
         VSEARCH_DEREPFULL_ALL.out.fasta
     )
+    ch_versions = ch_versions.mix(VSEARCH_CLUSTER_UNOISE.out.versions)
 
     // the denoised and chimera-filtered ASUs
     VSEARCH_UCHIME3_DENOVO(
         VSEARCH_CLUSTER_UNOISE.out.fasta
     )
+    ch_versions = ch_versions.mix(VSEARCH_UCHIME3_DENOVO.out.versions)
 
     // We now make OTUs because that is good enough for our purpose
     VSEARCH_CLUSTER_SIZE(
@@ -67,17 +70,21 @@ workflow VSEARCH_WORKFLOW {
         params.vsearch_cluster_id
 
     )
+    ch_versions = ch_versions.mix(VSEARCH_CLUSTER_SIZE.out.versions)
+
     // We taxonomically map the OTUS
     VSEARCH_SINTAX(
         VSEARCH_CLUSTER_SIZE.out.fasta,
         sintax_db
     )
+    ch_versions = ch_versions.mix(VSEARCH_SINTAX.out.versions)
 
     // We generate the OTU Table with sample IDs
     VSEARCH_USEARCH_GLOBAL(
         VSEARCH_CLUSTER_SIZE.out.fasta,
         ch_merged_reads.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
     )
+    ch_versions = ch_versions.mix(VSEARCH_USEARCH_GLOBAL.out.versions)
 
     SINTAX_OTU2TAB(
         VSEARCH_SINTAX.out.tsv.join(VSEARCH_USEARCH_GLOBAL.out.tab)
