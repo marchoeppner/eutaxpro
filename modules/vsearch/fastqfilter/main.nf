@@ -3,7 +3,7 @@ process VSEARCH_FASTQFILTER {
 
     label 'short_serial'
 
-    conda 'bioconda::vsearch=2.27.0'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/vsearch:2.27.0--h6a68c12_0' :
         'quay.io/biocontainers/vsearch:2.27.0--h6a68c12_0' }"
@@ -22,7 +22,11 @@ process VSEARCH_FASTQFILTER {
     filtered = prefix + '.filtered.fasta'
 
     """
-    vsearch -fastq_filter $fq -fastq_maxee_rate 0.1 -relabel Filtered -fastaout $filtered $args
+    vsearch -fastq_filter $fq \
+    -fastq_maxee_rate 0.1 \
+    -relabel Filtered \
+    -threads ${task.cpus} \
+    -fastaout $filtered $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

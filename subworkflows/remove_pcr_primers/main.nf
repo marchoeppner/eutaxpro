@@ -14,6 +14,7 @@ workflow REMOVE_PCR_PRIMERS {
     main:
     // Allow use of cutadapt if need be
     if (params.cutadapt) {
+        // Create the actual reverse-complemented primer sequences if need be
         if (params.cutadapt_trim_3p) {
             FASTX_REVERSE_COMPLEMENT(
                 ch_primers
@@ -21,6 +22,7 @@ workflow REMOVE_PCR_PRIMERS {
             ch_primers_rc = FASTX_REVERSE_COMPLEMENT.out.fasta
             ch_versions = ch_versions.mix(FASTX_REVERSE_COMPLEMENT.out.versions)
         }
+        // Run cutadapt
         CUTADAPT(
             reads,
             ch_primers,
@@ -29,6 +31,7 @@ workflow REMOVE_PCR_PRIMERS {
         ch_versions = ch_versions.mix(CUTADAPT.out.versions)
         ch_reads_no_primers = CUTADAPT.out.reads
     } else {
+        // Run Ptrimmer using the appropriate config file.
         PTRIMMER(
             reads,
             ch_ptrimmer_config

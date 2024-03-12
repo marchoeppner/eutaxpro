@@ -41,4 +41,4 @@ The path specified with `--outdir` can then be given to the pipeline during norm
 
 If you run on anything other than a local system, this pipeline requires a site-specific configuration file to be able to talk to your cluster or compute infrastructure. Nextflow supports a wide range of such infrastructures, including Slurm, LSF and SGE - but also Kubernetes and AWS. For more information, see [here](https://www.nextflow.io/docs/latest/executor.html).
 
-Site-specific config-files for our pipeline ecosystem are stored centrally on [github](https://github.com/marchoeppner/configs). Please talk to us if you want to add your system.
+Site-specific config-files for our pipeline ecosystem are stored centrally on [github](https://github.com/marchoeppner/nf-configs). Please talk to us if you want to add your system.

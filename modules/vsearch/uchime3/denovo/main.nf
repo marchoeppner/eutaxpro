@@ -24,6 +24,7 @@ process VSEARCH_UCHIME3_DENOVO {
 
     """
     vsearch --uchime3_denovo $fa \
+    --threads ${task.cpus} \
     --sizein \
     --sizeout \
     --nonchimera $nonchimera $args

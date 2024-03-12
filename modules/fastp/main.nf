@@ -3,7 +3,7 @@ process FASTP {
 
     label 'short_parallel'
 
-    conda 'bioconda::fastp=0.23.4'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/fastp:0.23.4--hadf994f_2' :
         'quay.io/biocontainers/fastp:0.23.4--hadf994f_2' }"

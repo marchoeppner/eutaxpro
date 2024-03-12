@@ -108,8 +108,6 @@ workflow EUTAXPRO {
 
     ch_illumina_trimmed = ch_reads_illumina.single.mix(CAT_FASTQ.out.reads)
 
-    ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
-
     // Remove PCR primers
     REMOVE_PCR_PRIMERS(
         ch_illumina_trimmed,
@@ -119,6 +117,7 @@ workflow EUTAXPRO {
     )
     ch_versions = ch_versions.mix(REMOVE_PCR_PRIMERS.out.versions)
     ch_reads_for_vsearch = ch_reads_for_vsearch.mix(REMOVE_PCR_PRIMERS.out.reads)
+    ch_reads_for_dada2 = ch_reads_for_dada2.mix(REMOVE_PCR_PRIMERS.out.reads)
 
     if ('vsearch' in tools) {
         // Turn cleaned reads into a taxonomic information with VSearch

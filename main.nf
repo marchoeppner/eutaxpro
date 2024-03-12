@@ -2,16 +2,16 @@
 
 nextflow.enable.dsl = 2
 
-// TODO: Update this block with a description and the name of the pipeline
+//
 /**
 ===============================
-Pipeline
+Eutaxpro Pipeline
 ===============================
 
 This Pipeline performs taxonomic profiling for eukaryotes from NGS data - for example in food safety analysis.
 
 ### Homepage / git
-git@github.com:marchoeppner/pipeline.git
+git@github.com:marchoeppner/eutaxpro.git
 
 **/
 
@@ -41,6 +41,22 @@ workflow {
 }
 
 workflow.onComplete {
+    if (params.primer_set) {
+        summary['PrimerSet'] = params.primer_set
+    }
+    if (params.primers_txt) {
+        summary['CustomPrimerSet'] = params.primers_txt
+    }
+    if (params.primers_fa) {
+        summary['PrimerFasta'] = params.primers_fa
+    }
+    if (params.cutadapt) {
+        summary['PrimerTrimmer'] = 'Cutadapt'
+    } else {
+        summary['PrimerTrimmer'] = 'Ptrimmer'
+    }
+    summary['Input'] = params.input
+
     hline = '========================================='
     log.info hline
     log.info "Duration: $workflow.duration"
@@ -99,14 +115,12 @@ workflow.onComplete {
             if (workflow.success && !params.skip_multiqc) {
                 mqcReport = multiqc_report.getVal()
                 if (mqcReport.getClass() == ArrayList) {
-                    // TODO: Update name of pipeline
-                    log.warn "[Pipeline] Found multiple reports from process 'multiqc', will use only one"
+                    log.warn "[Eutaxpro] Found multiple reports from process 'multiqc', will use only one"
                     mqcReport = mqcReport[0]
                 }
             }
         } catch (all) {
-            // TODO: Update name of pipeline
-            log.warn '[PipelineName] Could not attach MultiQC report to summary email'
+            log.warn '[Eutaxpro] Could not attach MultiQC report to summary email'
         }
 
         smailFields = [ email: params.email, subject: subject, emailText: emailText,

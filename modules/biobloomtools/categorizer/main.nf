@@ -5,7 +5,7 @@ process BIOBLOOMTOOLS_CATEGORIZER {
 
     tag "${meta.sample_id}|${meta.library_id}|${meta.readgroup_id}"
 
-    conda 'bioconda::biobloomtools=2.3.5'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/biobloomtools:2.3.5--h4056dc3_2' :
         'quay.io/biocontainers/biobloomtools:2.3.5--h4056dc3_2' }"

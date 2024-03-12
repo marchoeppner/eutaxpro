@@ -2,6 +2,11 @@
 
 This is not a full release. Please note that some things may not work as intended yet. 
 
+[Running the pipeline](#running-the-pipeline)
+[Options](#options)
+[Specialist options](#specialist-options)
+[Using Cutadapt](#using-cutadapt-instead-of-ptrimmer)
+
 ## Running the pipeline
 
 Please see our [installation guide](installation.md) to learn how to set up this pipeline first. 
@@ -117,7 +122,7 @@ The minimum amount of coverage required for an OTU to be created from the read d
 ### `--vsearch_cluster_id` [ default = 5 ]
 The percentage similarity for ASUs to be collapsed into OTUs. If you set this to 100, ASUs will not be collapsed at all, which will generate a higher resolution call set at the cost of added noise. 
 
-### Using Cutadapt instead of Ptrimmer
+## Using Cutadapt instead of Ptrimmer
 
 Using Cutadapt is discouraged for most users as it requires more configuration and knowledge of your read data. It may thus not yield optimal results in all circumstances. It does however support degenerate primer sequences, which Ptrimmer does not. 
 
