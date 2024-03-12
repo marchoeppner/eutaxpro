@@ -2,7 +2,7 @@ process SINTAX_OTU2TAB {
     tag "$meta.sample_id"
     label 'process_low'
 
-    conda 'conda-forge::perl=5.32'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ubuntu:20.04' :
         'ubuntu:20.04' }"

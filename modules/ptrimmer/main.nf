@@ -3,7 +3,7 @@ process PTRIMMER {
 
     tag "${meta.sample_id}"
 
-    conda 'bioconda::ptrimmer=1.3.3.'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/ptrimmer:1.3.3--h50ea8bc_5' :
         'quay.io/biocontainers/ptrimmer:1.3.3--h50ea8bc_5' }"

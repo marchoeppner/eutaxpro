@@ -12,6 +12,8 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 // The input sample sheet
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
+gene = "lrna"
+
 // Primer sets are either pre-configured or can be supplied by user
 if (params.primer_set) {
     ch_ptrimmer_config      = Channel.fromPath(file(params.references.primers[params.primer_set].ptrimmer_config, checkIfExits: true)).collect()
@@ -20,16 +22,14 @@ if (params.primer_set) {
     ch_primers_rc           = Channel.fromPath(file(params.references.primers[params.primer_set].fasta, checkIfExits: true)).collectFile(name: 'primers_rc.fasta')
 } else if (params.primers_txt) {
     ch_ptrimmer_config      = Channel.fromPath(file(params.primers_txt, checkIfExists: true)).collect()
-    gene                    = params.gene
+    gene                    = params.gene.toLowerCase()
     ch_primers              = Channel.from([])
     ch_primers_rc           = Channel.from([])
 } else if (params.primers_fa) {
     ch_ptrimmer_config      = Channel.from([])
     ch_primers              = Channel.fromPath(file(params.primers_fa, checkIfExists: true)).collect()
     ch_primers_rc           = Channel.fromPath(file(params.primers_fa, checkIfExists: true)).collectFile(name: 'primers_rc.fasta')
-    gene                    = params.gene
-} else {
-    log.info 'No primer information available - this should not happen...'
+    gene                    = params.gene.toLowerCase()
 }
 
 // The taxonomy database for this gene
@@ -108,8 +108,6 @@ workflow EUTAXPRO {
 
     ch_illumina_trimmed = ch_reads_illumina.single.mix(CAT_FASTQ.out.reads)
 
-    ch_reads_for_dada2 = ch_reads_for_dada2.mix(ch_illumina_trimmed)
-
     // Remove PCR primers
     REMOVE_PCR_PRIMERS(
         ch_illumina_trimmed,
@@ -119,6 +117,7 @@ workflow EUTAXPRO {
     )
     ch_versions = ch_versions.mix(REMOVE_PCR_PRIMERS.out.versions)
     ch_reads_for_vsearch = ch_reads_for_vsearch.mix(REMOVE_PCR_PRIMERS.out.reads)
+    ch_reads_for_dada2 = ch_reads_for_dada2.mix(REMOVE_PCR_PRIMERS.out.reads)
 
     if ('vsearch' in tools) {
         // Turn cleaned reads into a taxonomic information with VSearch

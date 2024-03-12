@@ -5,7 +5,7 @@ process UNZIP {
 
     publishDir "${params.outdir}/${meta.target}/${meta.tool}", mode: 'copy'
 
-    conda 'unzip'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mentalist:0.2.4--h031d066_7' :
         'quay.io/biocontainers/mentalist:0.2.4--h031d066_7' }"
