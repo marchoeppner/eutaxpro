@@ -18,9 +18,12 @@ A basic execution of the pipeline looks as follows:
 
 a) Without a site-specific config file
 
+```bash
+nextflow run marchoeppner/eutaxpro -profile standard,singularity --input samples.csv \\
+--reference_base /path/to/references \\
+--run_name pipeline-test
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,singularity --input samples.csv --reference_base /path/to/references --run_name pipeline-test
-```
+
 where `path_to_references` corresponds to the location in which you have [installed](installation.md) the pipeline references (this can be omitted to trigger an on-the-fly temporary installation, but is not recommended in production). 
 
 In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Available options to provision software are:
@@ -35,8 +38,9 @@ In this example, the pipeline will assume it runs on a single computer with the 
 
 b) with a site-specific config file
 
-```
-nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv --run_name pipeline-test 
+```bash
+nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv \\
+--run_name pipeline-test 
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. 
@@ -47,7 +51,7 @@ In this example, both `--reference_base` and the choice of software provisioning
 
 This pipeline expects a CSV-formatted sample sheet to properly pull various meta data through the processes. The required format looks as follows:
 
-```
+```CSV
 sample_id,platform,R1,R2
 S100,ILLUMINA,/home/marc/projects/gaba/data/S100_R1.fastq.gz,/home/marc/projects/gaba/data/S100_R2.fastq.gz
 ```
@@ -81,7 +85,7 @@ This text file will be read by [Ptrimmer](https://pubmed.ncbi.nlm.nih.gov/310771
 
 Briefly, the file is a simple text format with each row representing one pair of primers, as follows:
 
-```
+```TSV
 FORWARD_PRIMER_SEQ  REVERSE_PRIMER_SEQ  EXPECTED_PRODUCT_SIZE   NAME_OF_PRIMER
 ```
 
@@ -106,6 +110,7 @@ If you do not use a pre-configured primer set, you will also need to tell the pi
 - nd5
 - nd6
 
+Curated databases for these genes are obtained from [Midori](https://www.reference-midori.info/). 
 
 ### `--run_name Fubar` [default = null]
 
@@ -142,7 +147,7 @@ Using Cutadapt is discouraged for most users as it requires more configuration a
 
 Some possible usage examples:
 
-```
+```bash
 nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
 --primer_set par64_illumina \\
 --cutadapt \\
@@ -151,7 +156,7 @@ nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \
 
 This example uses a built-in primer set but performs PCR primer site removal with Cutadapt instead of Ptrimmer. 
 
-```
+```bash
 nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
 --cutadapt \\
 --primers_fa my_primers.fasta \\
@@ -161,7 +166,7 @@ nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \
 
 This example uses your custom primers, performs PCR primer site removal with cutadapt and performs taxonomic profiling against the srrna database. 
 
-```
+```bash
 nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
 --primer_set par64_illumina \\
 --cutadapt \\
