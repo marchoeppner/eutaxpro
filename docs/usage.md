@@ -3,8 +3,11 @@
 This is not a full release. Please note that some things may not work as intended yet. 
 
 [Running the pipeline](#running-the-pipeline)
+
 [Options](#options)
+
 [Specialist options](#specialist-options)
+
 [Using Cutadapt](#using-cutadapt-instead-of-ptrimmer)
 
 ## Running the pipeline
@@ -86,12 +89,23 @@ Note that the columns are tab-separated. The expected product size should be rou
 
 ### `--gene` [default = null]
 
-If you do not use a pre-configured primer set, you will also need to tell the pipeline which mitochondrial gene you are targeting. Available options are:
+If you do not use a pre-configured primer set, you will also need to tell the pipeline which mitochondrial gene you are targeting. Available options are (common choices in bold):
 
-- srrna
-- lrrna
-- co1
-- cytb
+- a6
+- a8
+- **srna**
+- **lrna**
+- **co1**
+- co2
+- co3
+- **cytb**
+- nd1
+- nd2
+- nd3
+- nd4l
+- nd5
+- nd6
+
 
 ### `--run_name Fubar` [default = null]
 
@@ -129,19 +143,30 @@ Using Cutadapt is discouraged for most users as it requires more configuration a
 Some possible usage examples:
 
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --primer_set par64_illumina --cutadapt --run_name cutadapt-test
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
+--primer_set par64_illumina \\
+--cutadapt \\
+--run_name cutadapt-test
 ```
 
 This example uses a built-in primer set but performs PCR primer site removal with Cutadapt instead of Ptrimmer. 
 
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --cutadapt --primers_fa my_primers.fasta --gene srrna --run_name cutadapt-test
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
+--cutadapt \\
+--primers_fa my_primers.fasta \\
+--gene srrna \\
+--run_name cutadapt-test
 ```
 
 This example uses your custom primers, performs PCR primer site removal with cutadapt and performs taxonomic profiling against the srrna database. 
 
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv --primer_set par64_illumina --cutadapt --cutadapt_trim_3p --run_name cutadapt-test
+nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
+--primer_set par64_illumina \\
+--cutadapt \\
+--cutadapt_trim_3p \\
+--run_name cutadapt-test
 ```
 
 This example will additionally reverse complement your primer sequences and check for primer binding sites at both ends of each read. 

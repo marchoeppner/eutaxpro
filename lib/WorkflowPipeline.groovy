@@ -16,25 +16,27 @@ class WorkflowPipeline {
             log.info 'This pipeline requires a sample sheet as input (--input)'
             System.exit(1)
         }
-        if (params.primer_set && !params.references.primers.keySet().contains(params.primer_set)) {
-            log.info "The primer set ${params.primer_set} is not currently configured."
-            System.exit(1)
-        }
-        if (!params.primer_set && !params.gene) {
-            log.info 'You have to specify which gene you are targeting if you do not use a built-in primer set (--gene)'
-            System.exit(1)
-        }
         if (!params.reference_base && !params.build_references) {
             log.info 'No local taxonomy reference specified - downloading on-the-fly instead...'
             log.info 'Consider installing the reference(s) as specified in our documentation!'
         }
-        if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
-            log.info 'No primer set (--primer_set) or custom primer configuration (--primers_txt) provided. Exiting...'
-            System.exit(1)
-        }
-        if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
-            log.info 'No primer information provided, exiting...'
-            System.exit(1)
+        if (!params.build_references) {
+            if (params.primer_set && !params.references.primers.keySet().contains(params.primer_set)) {
+                log.info "The primer set ${params.primer_set} is not currently configured."
+                System.exit(1)
+            }
+            if (!params.primer_set && !params.gene) {
+                log.info 'You have to specify which gene you are targeting if you do not use a built-in primer set (--gene)'
+                System.exit(1)
+            }
+            if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
+                log.info 'No primer set (--primer_set) or custom primer configuration (--primers_txt) provided. Exiting...'
+                System.exit(1)
+            }
+            if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
+                log.info 'No primer information provided, exiting...'
+                System.exit(1)
+            }
         }
     }
 
