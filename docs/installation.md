@@ -25,10 +25,13 @@ The pipeline comes with simple pre-set profiles for all of these as described [h
 
 ## Installing the references
 
-This pipeline requires locally stored genomes in fasta format. To build these, do:
+This pipeline requires locally stored references from the [Midori](https://www.reference-midori.info/) project. To build these, do:
 
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,singularity --build_references --run_name build_refs --outdir /path/to/references
+nextflow run marchoeppner/eutaxpro -profile standard,singularity \\
+--build_references \\
+--run_name build_refs \\
+--outdir /path/to/references
 ```
 
 where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. 

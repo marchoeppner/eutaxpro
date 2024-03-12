@@ -106,6 +106,7 @@ If you do not use a pre-configured primer set, you will also need to tell the pi
 - nd5
 - nd6
 
+Curated databases for these genes are obtained from [Midori](https://www.reference-midori.info/). 
 
 ### `--run_name Fubar` [default = null]
 
