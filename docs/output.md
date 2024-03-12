@@ -20,23 +20,23 @@ where hits are a sorted list of identified taxa and their respective percentages
 [
     { "sample": "SampleA",
       "hits": [ 
-        { "taxon": "Bos taurus", "reads" => 1234 },
-        { "taxon": "Sus scrofa", "reads" => 6543 }
+        { "taxon": "Bos taurus", "reads": 1234 },
+        { "taxon": "Sus scrofa", "reads": 6543 }
       ],
       "reads_total": 7777
     },
     {
         "sample": "SampleB",
       "hits": [ 
-        { "taxon": "Ovis aries", "reads" => 246 },
-        { "taxon": "Rangifer tarandus", "reads" => 753 }
+        { "taxon": "Ovis aries", "reads": 246 },
+        { "taxon": "Rangifer tarandus", "reads": 753 }
       ],
       "reads_total": 999
     }
 ]
 ```
 
-The data in this file is largely unfiltered and is can be useful to compute percentages and remove any taxa that fall below a threshold, like `< 1%` or whatever is appropriate for your use case. 
+The data in this file is largely unfiltered and it might be useful to compute percentages and remove any taxa that fall below a threshold, based on your specific use case. 
 
 </details>
 
