@@ -1,15 +1,25 @@
 
+/* 
+Import modules
+*/
+
 include { INPUT_CHECK }                 from './../modules/input_check'
 include { MULTIQC }                     from './../modules/multiqc/main'
+include { FASTP }                       from './../modules/fastp'
+include { CAT_FASTQ }                   from './../modules/cat_fastq'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
+
+/*
+Import sub workflows
+*/
 include { VSEARCH_WORKFLOW }            from './../subworkflows/vsearch'
 include { DADA2_WORKFLOW }              from './../subworkflows/dada2/dada2'
 include { REMOVE_PCR_PRIMERS }          from './../subworkflows/remove_pcr_primers'
-include { FASTP }                       from './../modules/fastp'
-include { CAT_FASTQ }                   from './../modules/cat_fastq'
-include { PORECHOP_PORECHOP }           from './../modules/porechop/porechop'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
+//include { NANOPORE_CONSENSUS }          from './../subworkflows/nanopore_consensus'
 
-// The input sample sheet
+/*
+Set default channels
+*/
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
 gene = "lrna"
@@ -77,14 +87,6 @@ workflow EUTAXPRO {
         pacbio: m.platform == 'PACBIO'
     }.set { ch_reads_by_platform }
     // channel: [[ sample_id: xxx, platform: xxx ], [ reads ] ]
-
-    // trim nanopore reads
-    PORECHOP_PORECHOP(
-        ch_reads_by_platform.nanopore
-    )
-    ch_versions = ch_versions.mix(PORECHOP_PORECHOP.out.versions)
-    multiqc_files = multiqc_files.mix(PORECHOP_PORECHOP.out.log)
-    ch_reads_for_vsearch = ch_reads_for_vsearch.mix(PORECHOP_PORECHOP.out.reads)
 
     // trim illumina reads
     FASTP(
