@@ -1,4 +1,6 @@
-
+/*
+include modules
+*/
 include { PORECHOP_ABI }            from './../../modules/porechop/abi'
 include { CHOPPER }                 from './../../modules/chopper'
 include { VSEARCH_CLUSTER_SIZE }    from './../../modules/vsearch/cluster_size'
@@ -7,10 +9,17 @@ include { VSEARCH_USEARCH_GLOBAL as VSEARCH_USEARCH_GLOBAL_ONT }  from './../../
 include { VSEARCH_SINTAX }          from './../../modules/vsearch/sintax'
 include { SINTAX_OTU2TAB }          from './../../modules/helper/sintax_otu2tab'
 include { SINTAX_OTU2JSON }         from './../../modules/helper/sintax_otu2json'
+include { SAMTOOLS_CONSENSUS }      from './../../modules/samtools/consensus'
+include { MINIMAP2 }                from './../../modules/minimap2/align'
+
+/*
+Include sub-workflows
+*/
+include { REMOVE_PCR_PRIMERS }      from './../remoce_pcr_primers'
 
 ch_versions = Channel.from([])
 
-workflow NANOPORE_CONSENSUS {
+workflow NANOPORE_WORKFLOW {
 
     take:
     reads
@@ -31,9 +40,13 @@ workflow NANOPORE_CONSENSUS {
     )
     ch_versions = ch_versions.mix(CHOPPER.out.versions)
 
+    REMOVE_PCR_PRIMERS(
+        CHOPPER.out.reads
+    )
+
     // Dummy call to rename fastq entries for downstream quantification
     VSEARCH_ORIENT(
-        NANOFILT.out.reads,
+        REMOVE_PCR_PRIMERS.out.reads,
         sintax_db
     )
 
@@ -46,11 +59,11 @@ workflow NANOPORE_CONSENSUS {
 
     MINIMAP2(
         VSEARCH_CLUSTER_SIZE.out.fasta,
-        CHOPPER.out.reads
+        reads
     )
 
     SAMTOOLS_CONSENSUS(
-        
+        MINIMAP2.out.bam
     )
 
    // We taxonomically map the OTUS

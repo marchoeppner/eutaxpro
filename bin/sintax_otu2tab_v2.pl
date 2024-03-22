@@ -2,7 +2,6 @@
 
 use strict;
 use Getopt::Long;
-use JSON;
 
 my $usage = qq{
 perl sintax_otu2tab.pl
@@ -58,10 +57,10 @@ foreach my $line (@lines) {
         } elsif (defined $taxon->{"g"}) {
             $otu_translations{$otu} = $taxon->{"g"};
         } else {
-            $otu_translations{$otu} = "No identification at genus level possible";
+            $otu_translations{$otu} = "Keine Auflösung zur Gattung möglich.";
         }
     } else {
-        $otu_translations{$otu} = "OTU unknown.";
+        $otu_translations{$otu} = "OTU unbekannt.";
     }
 }
 
@@ -75,13 +74,6 @@ chomp(my @lines = <$OTU>);
 my $hline = shift @lines;
 my @header = (split "\t", $hline);
 my $oc = shift @header;
-my @data = ();
-
-# This assumes that the order of samples is identical throughout but
-# saves time since we  not need to initialize anything moving forward. 
-foreach my $h (@header) {
-    push(@data, { "sample" => $h, "hits" => [], "reads_total" => 0 } )
-}
 
 foreach my $line (@lines) {
 
@@ -94,27 +86,75 @@ foreach my $line (@lines) {
     for (0..$#elements) {
         my $count = @elements[$_];
         my $sample = @header[$_];
-
-        # Skip any assignments that are zero. 
-        next if ($count == 0);
-
-        my %payload = ( "taxon" => $taxon, "reads" => $count);
+        my %payload = ( "taxon" => $taxon, "count" => $count);
         
-        push @{ $data[$_]{'hits'} }, \%payload ;
-
-        $data[$_]{'reads_total'} += $count ;
+        if (defined $matrix{$sample}) {
+            push @{ $matrix{$sample} },\%payload ;
+        } else {
+            $matrix{$sample} = [ \%payload ] ;
+        }
         
     }
 
 }
 
-my $json = encode_json(\@data);
 
 if ($outfile) {
     open(STDOUT, ">$outfile") or die("Cannot open $outfile");
 }
 
-print $json . "\n";
+printf "sample\treads\thits\n";
+
+# One sample, one row of results
+foreach my $sample (sort keys %matrix) {
+
+    my $hits = $matrix{$sample};
+    my $sum = 0.0 ;
+    my @row;
+
+    # We iterate once to get the total sum of reads
+    foreach my $hit (@{ $hits} ) {
+        my $count = $hit->{"count"};
+        my $taxon = $hit->{"taxon"};
+        
+        $sum += $count;
+
+        if ($count >= $min_cov) {
+            push @row, $hit;
+        }
+    
+    }  
+
+    # Sometimes we get slightly divergent OTUs for the same species, 
+    # lets add it up for a combined result
+    my %results ;
+
+    foreach my $hit(@row) {
+
+        my $taxon = $hit->{"taxon"};
+        my $count = $hit->{"count"};
+        if (defined $results{$taxon}) {
+            $results{$taxon} += $count;
+        } else {
+            $results{$taxon} = $count;
+        }
+
+    }
+
+    my @all;
+    printf $sample . "\t" . $sum . "\t";
+
+    foreach my $key (sort { $results{$b} <=> $results{$a} } keys %results ){
+        my $fcount = $results{$key};
+        my $perc = sprintf( "%.2f", ($fcount/$sum)*100);
+        next if ($perc < 1.0);
+        push(@all,"${key}:${perc}");
+    }
+
+    printf join(", ",@all);
+    printf "\n";
+    
+}
 
 # Turns the tax string into a hash
 sub decode_taxstring {

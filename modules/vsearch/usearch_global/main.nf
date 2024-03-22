@@ -1,7 +1,7 @@
 process VSEARCH_USEARCH_GLOBAL {
     tag "${meta.sample_id}"
 
-    label 'medium_parallel'
+    label 'short_parallel'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

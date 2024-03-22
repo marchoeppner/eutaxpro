@@ -160,7 +160,7 @@ This example uses a built-in primer set but performs PCR primer site removal wit
 nextflow run marchoeppner/eutaxpro -profile standard,conda --input samples.csv \\
 --cutadapt \\
 --primers_fa my_primers.fasta \\
---gene srrna \\
+--gene srna \\
 --run_name cutadapt-test
 ```
 
