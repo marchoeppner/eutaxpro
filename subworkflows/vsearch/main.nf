@@ -8,7 +8,7 @@ include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vs
 include { VSEARCH_USEARCH_GLOBAL }                      from './../../modules/vsearch/usearch_global'
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
 include { SINTAX_OTU2TAB }                              from './../../modules/helper/sintax_otu2tab'
-include { SINTAX_OTU2JSON }                              from './../../modules/helper/sintax_otu2json'
+include { SINTAX_OTU2JSON }                             from './../../modules/helper/sintax_otu2json'
 
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
