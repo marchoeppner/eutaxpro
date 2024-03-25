@@ -101,4 +101,4 @@ workflow VSEARCH_WORKFLOW {
     versions = ch_versions
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
-    }
+}
