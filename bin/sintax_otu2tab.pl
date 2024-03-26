@@ -125,6 +125,10 @@ foreach my $sample (sort keys %matrix) {
     
     }  
 
+    # Sometimes we get slightly divergent OTUs for the same species, 
+    # lets add it up for a combined result
+    
+
     # And now we print it out with percentages
     printf $sample . "\t" . $sum . "\t";
     my @all;

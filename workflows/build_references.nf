@@ -1,6 +1,4 @@
-include { GUNZIP } from './../modules/gunzip'
-include { UNZIP } from './../modules/unzip'
-include { STAGE } from './../modules/helper/stage'
+include { STAGE as INSTALL_MIDORI } from './../modules/helper/stage'
 
 genes = params.references.genes.keySet()
 
@@ -27,15 +25,8 @@ workflow BUILD_REFERENCES {
         uncompressed: !ir.toString().contains('.zip') && !r.toString().contains('.gz')
     }.set { ch_branched_files }
 
-    UNZIP(
-        ch_branched_files.zipped
-    )
-
-    //GUNZIP(
-    //    ch_branched_files.gzipped
-    //)
-
-    STAGE(
+    INSTALL_MIDORI(
         ch_branched_files.gzipped
     )
-    }
+
+}

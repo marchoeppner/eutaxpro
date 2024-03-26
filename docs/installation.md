@@ -1,6 +1,6 @@
 # Installation
 
-## Installating nextflow
+## Installing nextflow
 
 Nextflow is a highly portable pipeline engine. Please see the official [installation guide](https://www.nextflow.io/docs/latest/getstarted.html#installation) to learn how to set it up.
 
