@@ -18,7 +18,6 @@ Clean, trim and cluster reads for subsequent
 taxonomic profiling
 */
 workflow ILLUMINA_WORKFLOW {
-
     take:
     reads
     ch_ptrimmer_config
@@ -70,4 +69,4 @@ workflow ILLUMINA_WORKFLOW {
     tsv         = VSEARCH_WORKFLOW.out.tsv
     json        = VSEARCH_WORKFLOW.out.json
     qc          = multiqc_files
-}
+    }

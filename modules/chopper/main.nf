@@ -22,7 +22,7 @@ process CHOPPER {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: reads.getBaseName() + '.chopped'
-    
+
     """
     gunzip -c $reads | \\
     chopper \\
@@ -32,7 +32,7 @@ process CHOPPER {
         --maxlength $max_len \\
         -q 5 |
     gzip > ${prefix}.fastq.gz \\
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         chopper: \$( chopper --version | sed 's/chopper //' )

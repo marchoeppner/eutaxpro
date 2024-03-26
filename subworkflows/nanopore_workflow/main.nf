@@ -20,7 +20,6 @@ include { REMOVE_PCR_PRIMERS }      from './../remoce_pcr_primers'
 ch_versions = Channel.from([])
 
 workflow NANOPORE_WORKFLOW {
-
     take:
     reads
     sintax_db
@@ -66,7 +65,7 @@ workflow NANOPORE_WORKFLOW {
         MINIMAP2.out.bam
     )
 
-   // We taxonomically map the OTUS
+    // We taxonomically map the OTUS
     VSEARCH_SINTAX(
         VSEARCH_CLUSTER_SIZE.out.fasta,
         sintax_db
@@ -76,7 +75,7 @@ workflow NANOPORE_WORKFLOW {
     // We generate the OTU Table with sample IDs
     VSEARCH_USEARCH_GLOBAL_ONT(
         VSEARCH_CLUSTER_SIZE.out.fasta,
-        VSEARCH_ORIENT.out.reads.map{ m,f -> f }
+        VSEARCH_ORIENT.out.reads.map { m, f -> f }
     )
     ch_versions = ch_versions.mix(VSEARCH_USEARCH_GLOBAL.out.versions)
 
@@ -91,5 +90,4 @@ workflow NANOPORE_WORKFLOW {
     emit:
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     versions = ch_versions
-
 }
