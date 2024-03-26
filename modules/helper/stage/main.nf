@@ -1,5 +1,4 @@
 process STAGE {
-
     tag "${meta.target}|${meta.tool}"
 
     input:

@@ -1,5 +1,5 @@
 
-/* 
+/*
 Import modules
 */
 
@@ -17,7 +17,7 @@ Set default channels
 */
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
-gene = "lrna"
+gene = 'lrna'
 
 // Primer sets are either pre-configured or can be supplied by user
 if (params.primer_set) {
@@ -39,13 +39,10 @@ if (params.primer_set) {
 
 // The taxonomy database for this gene
 if (params.reference_base) {
-    ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db).collect()
+    ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db, checkIfExists: true).collect()
 } else {
     ch_db_sintax            = Channel.fromPath(file(params.references.genes[gene].sintax_url)).collect()
 }
-
-// PLACE HOLDER: data is single-end?
-single_end              = params.single_end
 
 ch_versions             = Channel.from([])
 multiqc_files           = Channel.from([])
@@ -87,4 +84,4 @@ workflow EUTAXPRO {
 
     emit:
     qc = MULTIQC.out.html
-}
+    }

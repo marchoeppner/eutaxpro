@@ -6,9 +6,6 @@ midori_files = []
 
 // For all genes of interest, recover supported tools and the corresponding database link
 genes.each { gene ->
-    midori_files << [ [ target: gene, tool: 'dada2' ] ,
-        file(params.references.genes[gene].dada2_url, checkIfExists: true)
-    ]
     midori_files << [ [ target: gene, tool: 'sintax' ] ,
         file(params.references.genes[gene].sintax_url, checkIfExists: true)
     ]
@@ -28,5 +25,4 @@ workflow BUILD_REFERENCES {
     INSTALL_MIDORI(
         ch_branched_files.gzipped
     )
-
-}
+    }

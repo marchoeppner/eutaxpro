@@ -19,7 +19,7 @@ A basic execution of the pipeline looks as follows:
 a) Without a site-specific config file
 
 ```bash
-nextflow run marchoeppner/eutaxpro -profile standard,singularity --input samples.csv \\
+nextflow run marchoeppner/eutaxpro -profile singularity --input samples.csv \\
 --reference_base /path/to/references \\
 --run_name pipeline-test
 ```
@@ -28,13 +28,13 @@ where `path_to_references` corresponds to the location in which you have [instal
 
 In this example, the pipeline will assume it runs on a single computer with the singularity container engine available. Available options to provision software are:
 
-`-profile standard,singularity`
+`-profile singularity`
 
-`-profile standard,docker` 
+`-profile docker` 
 
-`-profile standard,podman` 
+`-profile podman` 
 
-`-profile standard,conda` 
+`-profile conda` 
 
 b) with a site-specific config file
 
@@ -43,11 +43,11 @@ nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv \\
 --run_name pipeline-test 
 ```
 
-In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. 
+In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. In addition, you can set additional site-specific parameters, such as your local resource manager, node configuration (CPU, RAM, wall time), desired cache directory for the configured package/container software etc. 
 
 ## Options
 
-### `--input samplesheet.csv` [default = null]
+### `--input samples.csv` [default = null]
 
 This pipeline expects a CSV-formatted sample sheet to properly pull various meta data through the processes. The required format looks as follows:
 

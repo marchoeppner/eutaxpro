@@ -28,7 +28,7 @@ The pipeline comes with simple pre-set profiles for all of these as described [h
 This pipeline requires locally stored references from the [Midori](https://www.reference-midori.info/) project. To build these, do:
 
 ```
-nextflow run marchoeppner/eutaxpro -profile standard,singularity \\
+nextflow run marchoeppner/eutaxpro -profile singularity \\
 --build_references \\
 --run_name build_refs \\
 --outdir /path/to/references
