@@ -2,7 +2,6 @@
 /*
 Import modules
 */
-
 include { INPUT_CHECK }                 from './../modules/input_check'
 include { MULTIQC }                     from './../modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareversions'
@@ -76,9 +75,13 @@ workflow EUTAXPRO {
     multiqc_files = multiqc_files.mix(ILLUMINA_WORKFLOW.out.qc)
     ch_json_report = ILLUMINA_WORKFLOW.out.json
 
+    /*
+    Create human-readable report(s)
+    */
     REPORT(
         ch_json_report
     )
+    multiqc_files = multiqc_files.mix(REPORT.out.mqc_json)
 
     // Create list of software packages used
     CUSTOM_DUMPSOFTWAREVERSIONS(
