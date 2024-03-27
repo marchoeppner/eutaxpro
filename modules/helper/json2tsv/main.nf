@@ -1,25 +1,27 @@
-process SINTAX_OTU2JSON {
+process JSON2TSV {
     tag "$meta.sample_id"
     label 'short_serial'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/perl-json:4.10--pl5321hdfd78af_0' :
-        'quay.io/biocontainers/perl-json:4.10--pl5321hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/perl-json-parse:0.62--pl5321h4ac6f70_3' :
+        'quay.io/biocontainers/perl-json-parse:0.62--pl5321h4ac6f70_3' }"
 
     input:
-    tuple val(meta), path(sintax), path(otu_tab)
+    tuple val(meta), path(json)
 
     output:
-    tuple val(meta), path(result), emit: json
+    tuple val(meta), path('*.tsv'), emit: tsv
     path 'versions.yml'    , emit: versions
 
     script:
     def args = task.ext.args ?: ''
-    result = meta.sample_id + '.taxonomy_by_sample.json'
+    def prefix = task.ext.prefix ?: params.run_name
+    
+    result = prefix + '.taxonomy_by_sample.tsv'
 
     """
-    sintax_otu2json.pl --sintax $sintax --otu $otu_tab --outfile $result $args
+    eutaxpro_json2tsv.pl --json $json --outfile $result $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

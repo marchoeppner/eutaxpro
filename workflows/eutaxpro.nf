@@ -11,15 +11,19 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from './../modules/custom/dumpsoftwareve
 Import sub workflows
 */
 include { ILLUMINA_WORKFLOW }           from './../subworkflows/illumina_workflow'
+include { REPORT }                      from './../subworkflows/report'
 
 /*
 Set default channels
 */
 samplesheet             = params.input ? Channel.fromPath(file(params.input, checkIfExists:true)) : Channel.value([])
 
-gene = 'lrna'
+gene = null
 
-// Primer sets are either pre-configured or can be supplied by user
+/* 
+Primer sets are either pre-configured or can be supplied by user,
+preferably as Ptrimmer config, or as fasta for cutadapt.
+*/
 if (params.primer_set) {
     ch_ptrimmer_config      = Channel.fromPath(file(params.references.primers[params.primer_set].ptrimmer_config, checkIfExits: true)).collect()
     gene                    = params.references.primers[params.primer_set].gene
@@ -38,9 +42,9 @@ if (params.primer_set) {
 }
 
 // The taxonomy database for this gene
-if (params.reference_base) {
+if (params.reference_base && gene) {
     ch_db_sintax            = Channel.fromPath(params.references.genes[gene].sintax_db, checkIfExists: true).collect()
-} else {
+} else if (gene) {
     ch_db_sintax            = Channel.fromPath(file(params.references.genes[gene].sintax_url)).collect()
 }
 
@@ -70,6 +74,11 @@ workflow EUTAXPRO {
     )
     ch_versions = ch_versions.mix(ILLUMINA_WORKFLOW.out.versions)
     multiqc_files = multiqc_files.mix(ILLUMINA_WORKFLOW.out.qc)
+    ch_json_report = ILLUMINA_WORKFLOW.out.json
+
+    REPORT(
+        ch_json_report
+    )
 
     // Create list of software packages used
     CUSTOM_DUMPSOFTWAREVERSIONS(

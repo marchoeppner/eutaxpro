@@ -37,6 +37,11 @@ class WorkflowPipeline {
                 log.info 'No primer information provided, exiting...'
                 System.exit(1)
             }
+        } else {
+            if (params.build_references && !params.reference_base) {
+                log.info "Requested to build references without specifying the --reference_base"
+                System.exit(1)
+            }
         }
     }
 

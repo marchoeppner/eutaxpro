@@ -1,3 +1,6 @@
+/*
+Include Modules
+*/
 include { VSEARCH_FASTQMERGE }                          from './../../modules/vsearch/fastqmerge'
 include { VSEARCH_DEREPFULL }                           from './../../modules/vsearch/derep'
 include { VSEARCH_DEREPFULL as VSEARCH_DEREPFULL_ALL }  from './../../modules/vsearch/derep'
@@ -7,9 +10,11 @@ include { VSEARCH_CLUSTER_UNOISE }                      from './../../modules/vs
 include { VSEARCH_UCHIME3_DENOVO }                      from './../../modules/vsearch/uchime3/denovo'
 include { VSEARCH_USEARCH_GLOBAL }                      from './../../modules/vsearch/usearch_global'
 include { VSEARCH_SINTAX }                              from './../../modules/vsearch/sintax'
-include { SINTAX_OTU2TAB }                              from './../../modules/helper/sintax_otu2tab'
 include { SINTAX_OTU2JSON }                             from './../../modules/helper/sintax_otu2json'
 
+/* 
+Set default channels
+*/
 ch_versions = Channel.from([])
 ch_reports  = Channel.from([])
 ch_qc_files = Channel.from([])
@@ -87,18 +92,13 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_USEARCH_GLOBAL.out.versions)
 
-    SINTAX_OTU2TAB(
-        VSEARCH_SINTAX.out.tsv.join(VSEARCH_USEARCH_GLOBAL.out.tab)
-    )
-
     SINTAX_OTU2JSON(
         VSEARCH_SINTAX.out.tsv.join(VSEARCH_USEARCH_GLOBAL.out.tab)
     )
 
     emit:
-    tsv = SINTAX_OTU2TAB.out.tsv
     json = SINTAX_OTU2JSON.out.json
     versions = ch_versions
     fasta = VSEARCH_CLUSTER_SIZE.out.fasta
     qc = ch_qc_files
-    }
+}
