@@ -66,7 +66,6 @@ workflow ILLUMINA_WORKFLOW {
 
     emit:
     versions    = ch_versions
-    tsv         = VSEARCH_WORKFLOW.out.tsv
     json        = VSEARCH_WORKFLOW.out.json
     qc          = multiqc_files
     }

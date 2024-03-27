@@ -1,7 +1,0 @@
-name: vsearch_clustersize
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - bioconda::vsearch=2.27.0

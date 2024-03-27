@@ -1,7 +1,8 @@
-name: sintax_otu2tab
+name: sintax_otu2json
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
   - conda-forge::perl=5.32
+  - bioconda::perl-json-parse=0.62

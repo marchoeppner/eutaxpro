@@ -37,6 +37,15 @@ class WorkflowPipeline {
                 log.info 'No primer information provided, exiting...'
                 System.exit(1)
             }
+            if (params.primers_fa && !params.cutadapt) {
+                log.info "Provided primer information as Fasta file - this requires the option --cutadapt as well"
+                System.exit(1)
+            }
+        } else {
+            if (params.build_references && !params.reference_base) {
+                log.info "Requested to build references without specifying the --reference_base"
+                System.exit(1)
+            }
         }
     }
 

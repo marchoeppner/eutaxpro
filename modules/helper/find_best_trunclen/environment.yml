@@ -1,7 +1,0 @@
-name: find_best_trunclen
-channels:
-  - conda-forge
-  - bioconda
-  - defaults
-dependencies:
-  - conda-forge::pandas=1.1.5
