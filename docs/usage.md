@@ -4,6 +4,8 @@ This is not a full release. Please note that some things may not work as intende
 
 [Running the pipeline](#running-the-pipeline)
 
+[Pipeline version](#specifying-pipeline-version)
+
 [Options](#options)
 
 [Specialist options](#specialist-options)
@@ -44,6 +46,16 @@ nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv \\
 ```
 
 In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. In addition, you can set additional site-specific parameters, such as your local resource manager, node configuration (CPU, RAM, wall time), desired cache directory for the configured package/container software etc. 
+
+## Specifying pipeline version
+
+If you are running this pipeline in a production setting, you will want to lock the pipeline to a specific version. This is natively supported through nextflow with the `-r` argument:
+
+```bash
+nextflow run marchoeppner/eutaxpro -profile lsh -r 1.0 <other options here>
+```
+
+The `-r` option specifies a github [release tag](https://github.com/marchoeppner/eutaxpro/releases) or branch, so could also point to `main` for the very latest code release. Please note that every major release of this pipeline (1.0, 2.0 etc) comes with a new reference data set, which has the be [installed](installation.md) separately.
 
 ## Options
 
