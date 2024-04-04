@@ -37,10 +37,10 @@ if ($help) {
 # We read the JSON file
 my $json_in;
 {
-  local $/; #Enable 'slurp' mode
-  open my $fh, "<", $json;
-  $json_in = <$fh>;
-  close $fh;
+    local $/; #Enable 'slurp' mode
+    open my $fh, "<", $json;
+    $json_in = <$fh>;
+    close $fh;
 }
 
 my $data = decode_json($json_in);
