@@ -42,6 +42,8 @@ if ($outfile) {
     open(STDOUT, ">$outfile") or die("Cannot open $outfile");
 }
 
+printf "Sample\tReads\tTaxa\n" ;
+
 # We iterate over the list elements, which are individual samples
 foreach my $sample ( @{$data}) {
     
@@ -73,7 +75,7 @@ foreach my $sample ( @{$data}) {
     my @all;
 
     foreach my $key (sort { $matrix{$b} <=> $matrix{$a} } keys %matrix ){
-         my $fcount = $matrix{$key};
+        my $fcount = $matrix{$key};
         my $perc = sprintf( "%.2f", ($fcount/$sum)*100);
         next if ($perc < 1.0);
         push(@all,"${key}:${perc}");
