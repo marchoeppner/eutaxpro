@@ -64,6 +64,9 @@ workflow EUTAXPRO {
     }.set { ch_reads_by_platform }
     // channel: [[ sample_id: xxx, platform: xxx ], [ reads ] ]
 
+    /*
+    Processing of Illumina reads
+    */
     ILLUMINA_WORKFLOW(
         ch_reads_by_platform.illumina,
         ch_ptrimmer_config,
