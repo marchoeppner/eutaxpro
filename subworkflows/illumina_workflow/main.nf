@@ -48,7 +48,10 @@ workflow ILLUMINA_WORKFLOW {
     )
     ch_illumina_trimmed = ch_reads_illumina.single.mix(CAT_FASTQ.out.reads)
 
-    // Remove PCR primers
+    /*
+    Remove PCR primers - using Ptrimmer if possible,
+    or Cutadapt if requested
+    */
     REMOVE_PCR_PRIMERS(
         ch_illumina_trimmed,
         ch_ptrimmer_config,
@@ -57,7 +60,9 @@ workflow ILLUMINA_WORKFLOW {
     )
     ch_versions = ch_versions.mix(REMOVE_PCR_PRIMERS.out.versions)
 
-    // Cluster reads and perform taxonomic profiling
+    /*
+    Cluster reads and perform taxonomic profiling
+    */
     VSEARCH_WORKFLOW(
         REMOVE_PCR_PRIMERS.out.reads,
         ch_sintax_db
