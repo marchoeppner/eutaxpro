@@ -41,13 +41,16 @@ workflow VSEARCH_WORKFLOW {
     // we now have [ meta, fastq ]
     ch_merged_reads = VSEARCH_FASTQMERGE.out.fastq
 
-    // Files merged reads using static parameters
+    // Filter merged reads using static parameters
     // This is not ideal and could be improved!
     VSEARCH_FASTQFILTER(
         VSEARCH_FASTQMERGE.out.fastq
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQFILTER.out.versions)
 
+    /*
+    We concatenate all the filtered reads for joint de-replication
+    */
     VSEARCH_FASTQFILTER.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
         [ [sample_id: params.run_name ], fasta ]
     }.set { all_seqs }
@@ -85,13 +88,20 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_SINTAX.out.versions)
 
-    // We generate the OTU Table with sample IDs
+    /*
+    We generate the OTU Table with sample IDs
+    To this end all reads get sample IDs attached and are jointly mapped
+    and counted against our final set of OTUs
+    */
     VSEARCH_USEARCH_GLOBAL(
         VSEARCH_CLUSTER_SIZE.out.fasta,
         ch_merged_reads.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
     )
     ch_versions = ch_versions.mix(VSEARCH_USEARCH_GLOBAL.out.versions)
 
+    /*
+    Convert the sintax results into a count table in JSON format
+    */
     SINTAX_OTU2JSON(
         VSEARCH_SINTAX.out.tsv.join(VSEARCH_USEARCH_GLOBAL.out.tab)
     )
