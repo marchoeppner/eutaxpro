@@ -23,7 +23,8 @@ a) Without a site-specific config file
 ```bash
 nextflow run marchoeppner/eutaxpro -profile singularity --input samples.csv \\
 --reference_base /path/to/references \\
---run_name pipeline-test
+--run_name pipeline-test \\
+--primer_set par64_illumina
 ```
 
 where `path_to_references` corresponds to the location in which you have [installed](installation.md) the pipeline references (this can be omitted to trigger an on-the-fly temporary installation, but is not recommended in production). 
@@ -45,7 +46,7 @@ nextflow run marchoeppner/eutaxpro -profile lsh --input samples.csv \\
 --run_name pipeline-test 
 ```
 
-In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration and don't have to provided as command line argument. In addition, you can set additional site-specific parameters, such as your local resource manager, node configuration (CPU, RAM, wall time), desired cache directory for the configured package/container software etc. 
+In this example, both `--reference_base` and the choice of software provisioning are already set in the local configuration `lsh` and don't have to provided as command line argument. In addition, you can set additional site-specific parameters, such as your local resource manager, node configuration (CPU, RAM, wall time), desired cache directory for the configured package/container software etc. 
 
 ## Specifying pipeline version
 
@@ -81,11 +82,11 @@ Note that only Illumina processing is currently enabled - the rest is "coming ev
 
 ### `--primer_set ` [default = null]
 
-The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
+The name of the pre-configured primer set to use for read clipping. More sets will be added over time
 
 Available options:
 
-- par64_illumina (German BVL L00.00-184)
+- par64_illumina (mammals and birds, as published by [Dobrovolny et al.](https://pubmed.ncbi.nlm.nih.gov/30309555/))
 
 Alternatively, you can specify your own primers as described in the following.
 
@@ -101,7 +102,7 @@ Briefly, the file is a simple text format with each row representing one pair of
 FORWARD_PRIMER_SEQ  REVERSE_PRIMER_SEQ  EXPECTED_PRODUCT_SIZE   NAME_OF_PRIMER
 ```
 
-Note that the columns are tab-separated. The expected product size should be roughly correct, but doesn't need to accurate to the base. The primer sequences should represent the exact primer binding sequence. If you use primers with overhanging ends for e.g., downstream ligation, these overhanging ends must not be part of the sequence listed here. Also note that Ptrimmer does not understand degenerate primer sequences. If this is an issue, please let us know. 
+Note that the columns are tab-separated. The expected product size should be roughly correct, but doesn't need to accurate to the base. The primer sequences should represent the exact primer binding sequence. If you use primers with overhanging ends for e.g., downstream ligation, these overhanging ends must not be part of the sequence listed here. Also note that Ptrimmer does not understand degenerate primer sequences. If this is an issue, please consider using [Cutadapt](#using-cutadapt-instead-of-ptrimmer) instead of Ptrimmer.  
 
 ### `--gene` [default = null]
 
@@ -150,8 +151,8 @@ Only change these if you have a good reason to do so.
 ### `--vsearch_min_cov` [ default = 5 ]
 The minimum amount of coverage required for an OTU to be created from the read data. 
 
-### `--vsearch_cluster_id` [ default = 5 ]
-The percentage similarity for ASUs to be collapsed into OTUs. If you set this to 100, ASUs will not be collapsed at all, which will generate a higher resolution call set at the cost of added noise. 
+### `--vsearch_cluster_id` [ default = 98 ]
+The percentage similarity for ASUs to be collapsed into OTUs. If you set this to 100, ASUs will not be collapsed at all, which will generate a higher resolution call set at the cost of added noise. In turn, setting this value too low may collapse separate species into "hybrid" OTUs. The default of 98 seems to work quite well for our data, but will occasionally fragment individual taxa into multiple OTUs if sequencing error rate is high. For the TSV output, OTUs with identical taxonimic assignments will be counted as one, whereas the JSON output leaves this step to the user.
 
 ## Using Cutadapt instead of Ptrimmer
 

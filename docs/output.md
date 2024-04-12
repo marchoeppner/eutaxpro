@@ -12,13 +12,14 @@ sample  reads   hits
 SampleA 12678   Sus scrofa:75.5,Bos taurus:24.5
 ```
 
-where hits are a sorted list of identified taxa and their respective percentages of the total read count. 
+where hits are a sorted list of identified taxa and their respective percentages of the total read count. If a sample has multiple separate OTU hits for the same taxon, this taxon will be summed up across all matching OTUs to remove noise from the result. 
 
 - `name_of_pipeline_run`.taxonomy_by_sample.json: A JSON formatted data structure for downstream computational processing. The following structure is used:
 
 ```JSON
 [
-    { "sample": "SampleA",
+    { 
+      "sample": "SampleA",
       "hits": [ 
         { "taxon": "Bos taurus", "reads": 1234 },
         { "taxon": "Sus scrofa", "reads": 6543 }
@@ -26,7 +27,7 @@ where hits are a sorted list of identified taxa and their respective percentages
       "reads_total": 7777
     },
     {
-        "sample": "SampleB",
+      "sample": "SampleB",
       "hits": [ 
         { "taxon": "Ovis aries", "reads": 246 },
         { "taxon": "Rangifer tarandus", "reads": 753 }
@@ -36,7 +37,7 @@ where hits are a sorted list of identified taxa and their respective percentages
 ]
 ```
 
-The data in this file is largely unfiltered and it might be useful to compute percentages and remove any taxa that fall below a threshold, based on your specific use case. 
+The data in this file is largely unfiltered and it might be useful to compute percentages and remove any taxa that fall below a threshold and/or collapse hits from the same taxon into one result, based on your specific use case. 
 
 </details>
 

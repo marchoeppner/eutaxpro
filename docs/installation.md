@@ -34,7 +34,7 @@ nextflow run marchoeppner/eutaxpro -profile singularity \\
 --reference_base /path/to/references
 ```
 
-where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. If you have already added your own profile to our [configuration](https://github.com/marchoeppner/nf-configs) repository, there `--reference_base` option does not need to be set from the command line. 
+where `/path/to/references` could be something like `/data/pipelines/references` or whatever is most appropriate on your system. If you have already added your own profile to our [configuration](https://github.com/marchoeppner/nf-configs) repository, then the `--reference_base` option does not need to be set from the command line. 
 
 If you do not have singularity on your system, you can also specify docker, podman or conda for software provisioning - see the [usage information](usage.md).
 

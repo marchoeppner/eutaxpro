@@ -26,7 +26,7 @@ class WorkflowPipeline {
                 System.exit(1)
             }
             if (!params.primer_set && !params.gene) {
-                log.info 'You have to specify which gene you are targeting if you do not use a built-in primer set (--gene)'
+                log.info 'You have to specify which gene you are targeting (--gene) if you do not use a built-in primer set (--primer_set)'
                 System.exit(1)
             }
             if (!params.primer_set && !params.primers_txt && !params.primers_fa) {
