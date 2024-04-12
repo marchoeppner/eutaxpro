@@ -23,7 +23,8 @@ a) Without a site-specific config file
 ```bash
 nextflow run marchoeppner/eutaxpro -profile singularity --input samples.csv \\
 --reference_base /path/to/references \\
---run_name pipeline-test
+--run_name pipeline-test \\
+--primer_set par64_illumina
 ```
 
 where `path_to_references` corresponds to the location in which you have [installed](installation.md) the pipeline references (this can be omitted to trigger an on-the-fly temporary installation, but is not recommended in production). 
@@ -81,11 +82,11 @@ Note that only Illumina processing is currently enabled - the rest is "coming ev
 
 ### `--primer_set ` [default = null]
 
-The name of the pre-configured primer set to use for read clipping. At the moment, only one set is available which corresponds to the §64 German BVL guide lines L00.00-184. More sets will be added over time.
+The name of the pre-configured primer set to use for read clipping. More sets will be added over time
 
 Available options:
 
-- par64_illumina (German BVL L00.00-184)
+- par64_illumina (mammals and birds, as published by [Dobrovolny et al.](https://pubmed.ncbi.nlm.nih.gov/30309555/))
 
 Alternatively, you can specify your own primers as described in the following.
 
