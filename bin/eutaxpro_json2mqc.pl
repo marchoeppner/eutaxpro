@@ -76,6 +76,11 @@ foreach my $sample (@{$data}) {
     }
 }
 my @sorted_taxa = sort @taxa;
+my %taxlist;
+my @samples;
+foreach my $tax (@sorted_taxa) {
+    $taxlist{$tax} = 0;
+}
 
 # We iterate over the list elements, which are individual samples
 foreach my $sample ( @{$data}) {
@@ -86,6 +91,8 @@ foreach my $sample ( @{$data}) {
     my $sum = 0;
 
     my $s = $sample->{'sample'} ;
+    push(@samples,$s);
+
     my $hits = $sample->{'hits'};
 
     # Iterate over all taxonomic hits
@@ -110,12 +117,23 @@ foreach my $sample ( @{$data}) {
             my $count = $matrix{$taxon};
             my $perc = sprintf( "%.2f", ($count/$sum)*100);
             $bucket{$taxon} = $perc;
+            $taxlist{$taxon} += $count;
         } else {
             $bucket{$taxon} = 0 ;
         }
     }
     $mqc{'data'}{$s} = \%bucket;
 
+}
+
+# In the end we delete all taxa that have no reads in any of the samples
+foreach my $taxon (keys %taxlist) {
+    my $count = $taxlist{$taxon};
+    if ($count == 0) {
+        foreach my $sample (@samples) {
+            delete($mqc{'data'}{$sample}{$taxon});
+        }
+    }
 }
 
 my $json_out = encode_json(\%mqc);
