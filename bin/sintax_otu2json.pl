@@ -52,13 +52,16 @@ foreach my $line (@lines) {
 
     if (defined $final_call) {
         my $taxon = decode_taxstring($final_call);
+        my $unfilterd = decode_taxstring($tax_string);
         # Annotation has species level
         if (defined $taxon->{"s"}) {
             $otu_translations{$otu} = $taxon->{"s"};
         } elsif (defined $taxon->{"g"}) {
             $otu_translations{$otu} = $taxon->{"g"};
-        } else {
-            $otu_translations{$otu} = "No identification at genus level possible";
+        } elsif (defined $unfilterd->{"s"}) {
+            $otu_translations{$otu} = "weak_hit: " . $unfilterd->{"s"} ;
+        } elsif (defined $unfilterd->{"g"}) {
+            $otu_translations{$otu} = "weak_hit: " . $unfilterd->{"g"} ;
         }
     } else {
         $otu_translations{$otu} = "OTU unknown.";
