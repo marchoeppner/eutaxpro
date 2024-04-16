@@ -26,7 +26,8 @@ process VSEARCH_FASTQMERGE {
     --fastqout $merged \
     --threads ${task.cpus} \
     --fastq_eeout \
-    -relabel ${meta.sample_id}. \
+    --relabel ${meta.sample_id}. \
+    --sample ${meta.sample_id} \
     $args
 
     cat <<-END_VERSIONS > versions.yml

@@ -1,7 +1,7 @@
-name: cutadapt
+name: primer_disambiguate
 channels:
   - conda-forge
   - bioconda
   - defaults
 dependencies:
-  - bioconda::cutadapt=4.6
+  - bioconda::perl-bioperl=1.7.8

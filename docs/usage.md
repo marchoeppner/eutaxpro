@@ -102,7 +102,7 @@ Briefly, the file is a simple text format with each row representing one pair of
 FORWARD_PRIMER_SEQ  REVERSE_PRIMER_SEQ  EXPECTED_PRODUCT_SIZE   NAME_OF_PRIMER
 ```
 
-Note that the columns are tab-separated. The expected product size should be roughly correct, but doesn't need to accurate to the base. The primer sequences should represent the exact primer binding sequence. If you use primers with overhanging ends for e.g., downstream ligation, these overhanging ends must not be part of the sequence listed here. Also note that Ptrimmer does not understand degenerate primer sequences. If this is an issue, please consider using [Cutadapt](#using-cutadapt-instead-of-ptrimmer) instead of Ptrimmer.  
+Note that the columns are tab-separated. The expected product size should be roughly correct, but doesn't need to accurate to the base. The primer sequences should represent the exact primer binding sequence. If you use primers with overhanging ends for e.g., downstream ligation, these overhanging ends must not be part of the sequence listed here. Also note that Ptrimmer does not understand degenerate primer sequences. If this is an issue, please use [Cutadapt](#using-cutadapt-instead-of-ptrimmer) instead of Ptrimmer.  
 
 ### `--gene` [default = null]
 
@@ -200,9 +200,6 @@ Use this option if you know that your read length is as long or longer than your
 Any additional options you feel should be passed to Cutadapt. Use at your own risk. 
 
 #### `--primers_fa` [ default = null ]
-Your primer sequences in FASTA format. There is no need to provide reverse-complemented sequences here if you wish to use `--cutadapt_trim_3p`, since the pipeline will do that automatically. 
+Your primer sequences in FASTA format. There is no need to provide reverse-complemented sequences here if you wish to use `--cutadapt_trim_3p`, since the pipeline will do that automatically. If the primers in this file contain degenerate bases, the pipeline will automatically disambiguate them. 
 
 This option requires that you also specify a valid gene name (see above) so that the pipeline knows which database to use for taxonomic profiling. 
-
-
-
