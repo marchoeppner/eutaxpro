@@ -1,6 +1,5 @@
 //
-// This file holds several functions specific to the workflow/esga.nf in the nf-core/esga pipeline
-//
+// This file holds several functions specific to this pipeline
 
 class WorkflowPipeline {
 
