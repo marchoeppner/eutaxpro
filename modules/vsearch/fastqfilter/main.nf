@@ -23,7 +23,6 @@ process VSEARCH_FASTQFILTER {
 
     """
     vsearch -fastq_filter $fq \
-    -fastq_maxee_rate 0.1 \
     -relabel ${meta.sample_id}_Filt. \
     -threads ${task.cpus} \
     --sample ${meta.sample_id} \

@@ -19,8 +19,8 @@ process VSEARCH_CLUSTER_UNOISE {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.sample_id}"
-    cluster = prefix + '.precluster.fasta'
-    uc = prefix + '.precluster.uc'
+    cluster = prefix + '.denoised.fasta'
+    uc = prefix + '.denoised.uc'
 
     """
     vsearch --cluster_unoise $fa \

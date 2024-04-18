@@ -48,10 +48,20 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQFILTER.out.versions)
 
+    VSEARCH_DEREPFULL(
+        VSEARCH_FASTQFILTER.out.fasta
+    )
+    ch_versions = ch_versions.mix(VSEARCH_DEREPFULL.out.versions)
+
+    VSEARCH_CLUSTER_UNOISE(
+        VSEARCH_DEREPFULL.out.fasta
+    )
+    ch_versions = ch_versions.mix(VSEARCH_CLUSTER_UNOISE.out.versions)
+
     /*
     We concatenate all the filtered reads for joint de-replication
     */
-    VSEARCH_FASTQFILTER.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
+    VSEARCH_CLUSTER_UNOISE.out.fasta.map { m, f -> f }.collectFile(name: 'all.fasta').map { fasta ->
         [ [sample_id: params.run_name ], fasta ]
     }.set { all_seqs }
 
@@ -61,23 +71,15 @@ workflow VSEARCH_WORKFLOW {
     )
     ch_versions = ch_versions.mix(VSEARCH_DEREPFULL_ALL.out.versions)
 
-    // The initial set of ASUs
-    VSEARCH_CLUSTER_UNOISE(
-        VSEARCH_DEREPFULL_ALL.out.fasta
-    )
-    ch_versions = ch_versions.mix(VSEARCH_CLUSTER_UNOISE.out.versions)
-
     // the denoised and chimera-filtered ASUs
     VSEARCH_UCHIME3_DENOVO(
-        VSEARCH_CLUSTER_UNOISE.out.fasta
+        VSEARCH_DEREPFULL_ALL.out.fasta
     )
     ch_versions = ch_versions.mix(VSEARCH_UCHIME3_DENOVO.out.versions)
 
     // We now make OTUs because that is good enough for our purpose
     VSEARCH_CLUSTER_SIZE(
-        VSEARCH_UCHIME3_DENOVO.out.fasta,
-        params.vsearch_cluster_id
-
+        VSEARCH_UCHIME3_DENOVO.out.fasta
     )
     ch_versions = ch_versions.mix(VSEARCH_CLUSTER_SIZE.out.versions)
 

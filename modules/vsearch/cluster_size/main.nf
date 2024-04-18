@@ -1,7 +1,7 @@
 process VSEARCH_CLUSTER_SIZE {
     tag "${meta.sample_id}"
 
-    label 'short_serial'
+    label 'short_parallel'
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -10,7 +10,6 @@ process VSEARCH_CLUSTER_SIZE {
 
     input:
     tuple val(meta), path(fa)
-    val(cluster_id)
 
     output:
     tuple val(meta), path(cluster), emit: fasta
@@ -26,7 +25,6 @@ process VSEARCH_CLUSTER_SIZE {
     """
     vsearch --cluster_size $fa \
     --threads ${task.cpus} \
-    --id $cluster_id \
     --uc $uc \
     --centroids $cluster $args
 

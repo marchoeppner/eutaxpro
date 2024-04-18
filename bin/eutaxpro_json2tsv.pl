@@ -77,7 +77,7 @@ foreach my $sample ( @{$data}) {
     foreach my $key (sort { $matrix{$b} <=> $matrix{$a} } keys %matrix ){
         my $fcount = $matrix{$key};
         my $perc = sprintf( "%.2f", ($fcount/$sum)*100);
-        next if ($perc < 1.0);
+        next if ($perc < 0.1);
         push(@all,"${key}:${perc}");
     }
     printf join(", ",@all);
