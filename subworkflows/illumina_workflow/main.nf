@@ -8,10 +8,12 @@ include { CAT_FASTQ }                   from './../../modules/cat_fastq'
 Import sub workflows
 */
 include { VSEARCH_WORKFLOW }            from './../vsearch'
+include { VSEARCH_SINGLE }              from './../vsearch_single'
 include { REMOVE_PCR_PRIMERS }          from './../remove_pcr_primers'
 
 ch_versions = Channel.from([])
 multiqc_files = Channel.from([])
+ch_jsons = Channel.from([])
 
 /*
 Clean, trim and cluster reads for subsequent
@@ -63,14 +65,24 @@ workflow ILLUMINA_WORKFLOW {
     /*
     Cluster reads and perform taxonomic profiling
     */
-    VSEARCH_WORKFLOW(
-        REMOVE_PCR_PRIMERS.out.reads,
-        ch_sintax_db
-    )
-    ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
+    if (params.vsearch_single) {
+        VSEARCH_SINGLE(
+            REMOVE_PCR_PRIMERS.out.reads,
+            ch_sintax_db
+        )
+        ch_jsons = VSEARCH_SINGLE.out.json
+        ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
+    } else {
+        VSEARCH_WORKFLOW(
+            REMOVE_PCR_PRIMERS.out.reads,
+            ch_sintax_db
+        )
+        ch_jsons = VSEARCH_WORKFLOW.out.json
+        ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
+    }
 
     emit:
     versions    = ch_versions
-    json        = VSEARCH_WORKFLOW.out.json
+    json        = ch_jsons
     qc          = multiqc_files
     }

@@ -31,7 +31,9 @@ workflow VSEARCH_WORKFLOW {
         unpaired: m.single_end
     }.set { ch_trimmed_reads }
 
-    // Merge PE files and attach sample names
+    /*
+    Merge PE files
+    */
     VSEARCH_FASTQMERGE(
         ch_trimmed_reads.paired.map { m, r -> [m, r[0], r[1]] }
     )
@@ -41,18 +43,26 @@ workflow VSEARCH_WORKFLOW {
     // we now have [ meta, fastq ]
     ch_merged_reads = VSEARCH_FASTQMERGE.out.fastq
 
-    // Filter merged reads using static parameters
-    // This is not ideal and could be improved!
+    /*
+    Filter merged reads using static parameters
+    This is not ideal and could be improved!
+    */
     VSEARCH_FASTQFILTER(
         VSEARCH_FASTQMERGE.out.fastq
     )
     ch_versions = ch_versions.mix(VSEARCH_FASTQFILTER.out.versions)
 
+    /*
+    Dereplicate the individual samples
+    */
     VSEARCH_DEREPFULL(
         VSEARCH_FASTQFILTER.out.fasta
     )
     ch_versions = ch_versions.mix(VSEARCH_DEREPFULL.out.versions)
 
+    /*
+    Denoise invidual samples
+    */
     VSEARCH_CLUSTER_UNOISE(
         VSEARCH_DEREPFULL.out.fasta
     )
@@ -65,19 +75,25 @@ workflow VSEARCH_WORKFLOW {
         [ [sample_id: params.run_name ], fasta ]
     }.set { all_seqs }
 
-    // Dereplicate the concatenated set of sequences
+    /*
+    Dereplicate the concatenated set of sequences
+    */
     VSEARCH_DEREPFULL_ALL(
         all_seqs
     )
     ch_versions = ch_versions.mix(VSEARCH_DEREPFULL_ALL.out.versions)
 
-    // the denoised and chimera-filtered ASUs
+    /*
+    Remove chimera from the set of ASUs
+    */
     VSEARCH_UCHIME3_DENOVO(
         VSEARCH_DEREPFULL_ALL.out.fasta
     )
     ch_versions = ch_versions.mix(VSEARCH_UCHIME3_DENOVO.out.versions)
 
-    // We now make OTUs because that is good enough for our purpose
+    /*
+    Perform clustering of the chimera-filteredf ASUs into OTUs
+    */
     VSEARCH_CLUSTER_SIZE(
         VSEARCH_UCHIME3_DENOVO.out.fasta
     )

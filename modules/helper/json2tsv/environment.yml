@@ -5,4 +5,4 @@ channels:
   - defaults
 dependencies:
   - conda-forge::perl=5.32
-  - bioconda::perl-json-parse=0.62
+  - bioconda::perl-json-xs=4.03

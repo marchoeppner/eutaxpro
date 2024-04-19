@@ -4,8 +4,8 @@ process JSON2TSV {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/perl-json-parse:0.62--pl5321h4ac6f70_3' :
-        'quay.io/biocontainers/perl-json-parse:0.62--pl5321h4ac6f70_3' }"
+        'https://depot.galaxyproject.org/singularity/perl-json-xs:4.03--pl5321h4ac6f70_2' :
+        'quay.io/biocontainers/perl-json-xs:4.03--pl5321h4ac6f70_2' }"
 
     input:
     tuple val(meta), path(json)
@@ -21,7 +21,7 @@ process JSON2TSV {
     result = prefix + '.taxonomy_by_sample.tsv'
 
     """
-    eutaxpro_json2tsv.pl --json $json --outfile $result $args
+    eutaxpro_json2tsv_v2.pl --json $json --outfile $result $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

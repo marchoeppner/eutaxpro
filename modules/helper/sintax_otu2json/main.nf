@@ -19,7 +19,7 @@ process SINTAX_OTU2JSON {
     result = meta.sample_id + '.taxonomy_by_sample.json'
 
     """
-    sintax_otu2json.pl --sintax $sintax --otu $otu_tab --outfile $result $args
+    sintax_otu2json_v2.pl --sintax $sintax --otu $otu_tab --outfile $result $args
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

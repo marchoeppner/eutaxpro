@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
-
 use strict;
 use Getopt::Long;
-use JSON;
+use JSON::XS;
 use Data::Dumper;
 
 my $usage = qq{
-perl sintax_otu2tab.pl
+perl sintax_otu2tab_v2.pl
     Getting help:
     [--help]
 
@@ -24,10 +23,8 @@ perl sintax_otu2tab.pl
 my $outfile     = undef;
 my $sintax      = undef;
 my $otu         = undef;
-my $min_cov     = 10;
 
 my %otu_translations;
-my %matrix;
 my $help;
 
 GetOptions(
@@ -58,8 +55,6 @@ foreach my $line (@lines) {
         $taxdata = decode_taxstring($tax_string);
     } 
     
-    printf Dumper($taxdata);
-
     $otu_translations{$otu} = $taxdata ;
 }
 
