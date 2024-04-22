@@ -71,7 +71,7 @@ workflow ILLUMINA_WORKFLOW {
             ch_sintax_db
         )
         ch_jsons = VSEARCH_SINGLE.out.json
-        ch_versions = ch_versions.mix(VSEARCH_WORKFLOW.out.versions)
+        ch_versions = ch_versions.mix(VSEARCH_SINGLE.out.versions)
     } else {
         VSEARCH_WORKFLOW(
             REMOVE_PCR_PRIMERS.out.reads,

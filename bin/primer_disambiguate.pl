@@ -49,7 +49,7 @@ while (my $seq = $seqin->next_seq) {
     my $id = $seq->display_id();
     my $count = 0;
 
-    printf STDERR $id . "\n";
+   # printf STDERR $id . "\n";
    # Create all possible non-degenerate sequences
     my $iupac = Bio::Tools::IUPAC->new(-seq => $seq);
     while (my $uniqueseq = $iupac->next_seq()) {

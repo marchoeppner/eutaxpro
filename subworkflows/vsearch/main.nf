@@ -112,8 +112,11 @@ workflow VSEARCH_WORKFLOW {
     and counted against our final set of OTUs
     */
     VSEARCH_USEARCH_GLOBAL(
-        VSEARCH_CLUSTER_SIZE.out.fasta,
-        ch_merged_reads.map { m, f -> f }.collectFile(name: 'all.merged.fastq')
+        VSEARCH_CLUSTER_SIZE.out.fasta.join(
+            ch_merged_reads.map { m, f -> f }.collectFile(name: 'all.merged.fastq').map {fasta ->
+                [[sample_id: params.run_name],fasta]
+            }
+        )
     )
     ch_versions = ch_versions.mix(VSEARCH_USEARCH_GLOBAL.out.versions)
 
