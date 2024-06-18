@@ -21,8 +21,7 @@ perl eutaxpro_json2tsv.pl
 
 my $outfile     = undef;
 my $json        = undef;
-my $min_cov     = 10;
-
+my $min_perc    = 0.1;
 my $help;
 
 GetOptions(
@@ -92,6 +91,7 @@ foreach my $entry ( @$data) {
             }
         }
 
+        next if($perc < $min_perc);
         printf $sample . "\t" . $count . "\t" . $perc . "\t" . $species . "\t" . $taxgroup . "\t" . $bs . "\n";
         
     }
